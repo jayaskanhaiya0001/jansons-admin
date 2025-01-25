@@ -66,6 +66,8 @@ const Dashboard = () => {
       const tempData2 = await getData('https://jainsons-pvt.vercel.app/api/quotes/getAll');
       const tempData3 = await getData('https://jainsons-pvt.vercel.app/api/contactUs/showAll');
       const tempData4 = await getData('https://jainsons-pvt.vercel.app/api/categories/showAll');
+
+      console.log('temp: ', tempData4);
   
       setProductData(tempData1);
       setQuoteData(tempData2);
@@ -77,7 +79,22 @@ const Dashboard = () => {
   }, []); 
 
   const forgetThese = ['_id', 'img', 'imageURLs', '__v']
-  // const spaceThese = ['updatedat', 'createdat']
+
+  const getCategory = (catId) =>{
+    if(categoryData){
+      const catF = categoryData.find((cat)=>
+        cat._id == catId
+      )
+      return catF.name;
+    }
+    return null;
+  }
+
+  const transformData = (data) => {
+    return data
+      .map(item => `${item.key}: ${item.value}`) // Create key-value pairs
+      .join(', '); // Join them with commas
+  };
 
   const renderTable = (data) => {
     // //console.log('data: ', data.map());
@@ -100,22 +117,18 @@ const Dashboard = () => {
           <TableBody>
             {data.map((item, index) => (
               <TableRow key={index}>
-                {/* {//console.log(Object?.values(item))} */}
+                
                 {Object.entries(item || {}).map(([key, value], idx) => 
                   // Only render cells if the key is not in the 'forgetThese' array
                   !forgetThese.includes(key) ? (
                     <TableCell key={idx}>
-                      {typeof value === 'object' ? JSON.stringify(value) : value}
+                      {typeof value === 'object' ? transformData(value)
+                       : 
+                       key !== 'category' ? value: getCategory(value)}
                     </TableCell>
                   ) : null
                 )}
 
-                {/* {Object?.values(item)?.map((value, idx) => 
-                
-                  <TableCell key={idx}>
-                    {typeof value === 'object' ? JSON.stringify(value) : value}
-                  </TableCell>
-                )} */}
               </TableRow>
             ))}
           </TableBody>
