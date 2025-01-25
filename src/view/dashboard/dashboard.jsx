@@ -36,7 +36,7 @@ const Dashboard = () => {
   const [isContentVisible, setIsContentVisible] = useState('');
 
   const setVisibleContent = (st) =>{
-    console.log('st: ', st);
+    //console.log('st: ', st);
     setIsContentVisible(st);
   }
 
@@ -46,7 +46,7 @@ const Dashboard = () => {
     const fetchData = async () => {
       const getData = async (url) => {
         const getToken = localStorage.getItem('token');
-        console.log('The token is: ', getToken);
+        //console.log('The token is: ', getToken);
   
         try {
           const response = await axios.get(url, {
@@ -80,7 +80,7 @@ const Dashboard = () => {
   // const spaceThese = ['updatedat', 'createdat']
 
   const renderTable = (data) => {
-    // console.log('data: ', data.map());
+    // //console.log('data: ', data.map());
     return (
       // <span>sfs</span>
       <TableContainer component={Paper} sx={{ mt: 4 }}>
@@ -100,7 +100,7 @@ const Dashboard = () => {
           <TableBody>
             {data.map((item, index) => (
               <TableRow key={index}>
-                {/* {console.log(Object?.values(item))} */}
+                {/* {//console.log(Object?.values(item))} */}
                 {Object.entries(item || {}).map(([key, value], idx) => 
                   // Only render cells if the key is not in the 'forgetThese' array
                   !forgetThese.includes(key) ? (
