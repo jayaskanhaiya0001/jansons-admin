@@ -19,7 +19,7 @@ import {
 
 import { Delete, Edit } from '@mui/icons-material';
 import { useForm, Controller } from "react-hook-form";
-
+import axios from "axios";
 // import { InputAsterisk } from "../../component/label/InputLabels";
 const CustomButton = styled(Button)(({ theme }) => ({
     padding: '8px 16px !important',
@@ -97,7 +97,9 @@ const categories = [
 ];
 
 const Product = () => {
+    const token = localStorage.getItem('token')
     const [drawerOpen, setDrawerOpen] = useState(false);
+    const [categories, setCategories] = useState([])
     const [editorData, setEditorData] = useState("");
     // const [products, setProducts] = useState([]);
 
@@ -115,7 +117,20 @@ const Product = () => {
             material: "",
             size: "",
             brand: "",
-            image: null
+            image: null,
+            features: [{
+                key: "Material",
+                value: ''
+            },
+            {
+                key: "Brand",
+                value: ''
+            },
+            {
+                key: "Size",
+                value: ''
+            },
+            ]
         }
     });
 
@@ -160,14 +175,53 @@ const Product = () => {
     }
 
     const newCategory = watch("newCategory");
-    const handleAddCategory = (newCategory) => {
 
-        if (newCategory.trim() !== "" && !categoryList.includes(newCategory)) {
-            setCategoryList((prev) => [...prev, newCategory]);
-            setValue("newCategory", ""); // Reset the input
-        } else {
-            alert("Category already exists or is empty!");
+    const getAllCategory = async () => {
+        try {
+            const response = await axios.get("https://jainsons-pvt.vercel.app/api/categories/showAll", {
+                headers: {
+                    Authorization: `Bearer ${token}`
+                }
+            });
+            if (response.data) {
+                setCategories(response.data?.data)
+            } else {
+                //   setErrorMsg("Invalid credentials. Please try again.");
+            }
+        } catch (error) {
+            // setErrorMsg("Error logging in. Please check your credentials.");
+        } finally {
+            // setLoading(false);
         }
+    }
+    const handleAddCategory = async (newCategory) => {
+        try {
+            const response = await axios.post("https://jainsons-pvt.vercel.app/api/categories/add", { name: newCategory }, {
+                headers: {
+                    Authorization: `Bearer ${token}`
+                }
+            });
+
+            if (response.data) {
+                // navigator('/dashboard')
+            } else {
+                //   setErrorMsg("Invalid credentials. Please try again.");
+            }
+        } catch (error) {
+            // setErrorMsg("Error logging in. Please check your credentials.");
+        } finally {
+            // setLoading(false);
+        }
+
+    };
+
+    const features = watch("features");
+
+    // Function to update a feature's value by index
+    const updateFeature = (index, newValue) => {
+        const updatedFeatures = [...features];
+        updatedFeatures[index].value = newValue;
+        setValue("features", updatedFeatures);
     };
 
     const handleDelete = (index) => {
@@ -183,7 +237,11 @@ const Product = () => {
         Object.keys(product).forEach(key => setValue(key, product[key]));
     };
 
+    useEffect(() => {
+        getAllCategory()
+    }, [])
 
+    console.log(categories, 'categories')
     return (
         <div style={{ height: "100%" }}>
             <Box display={'flex'} flex={1} justifyContent={'space-between'} mb={4} pt={4} px={4}>
@@ -211,6 +269,7 @@ const Product = () => {
                                         fullWidth
                                         variant="outlined"
                                         size="small"
+                                        margin="normal"
                                     />
                                 </Box>
                             )}
@@ -224,150 +283,121 @@ const Product = () => {
                             Add Category
                         </CustomButton>
                     </Box>
-                    <InputLabel>Category</InputLabel>
-                    <Controller
-                        name="category"
-                        control={control}
-                        defaultValue=""
-                        render={({ field, fieldState }) => (
-                            <Select
-                                {...field}
-                                fullWidth
-                                error={!!fieldState.error}
-                                size="small"
-                            >
-                                {categoryList.map((category, index) => (
-                                    <MenuItem key={index} value={category}>
-                                        {category}
-                                    </MenuItem>
-                                ))}
-                            </Select>
-                        )}
-                    />
-                    <InputLabel>Title</InputLabel>
-                    <Controller
-                        name="title"
-                        control={control}
-                        defaultValue=""
-                        render={({ field }) => (
-                            <TextField
-                                {...field}
-                                sx={{ margin: 0 }}
-                                type="text"
-                                fullWidth
-                                margin="normal"
-                                required
-                                size="small"
+                    <Box mb={2}>
+
+                        <InputLabel>Category</InputLabel>
+                        <Controller
+                            name="category"
+                            control={control}
+                            defaultValue=""
+                            render={({ field, fieldState }) => (
+                                <Select
+                                    {...field}
+                                    fullWidth
+                                    error={!!fieldState.error}
+                                    size="small"
+                                    margin="normal"
+                                >
+                                    {categories?.map((category, index) => (
+                                        <MenuItem key={index} value={category?._id}>
+                                            {category?.name}
+                                        </MenuItem>
+                                    ))}
+                                </Select>
+                            )}
+                        />
+                    </Box>
+                    <Box mb={2}>
+                        <InputLabel>Title</InputLabel>
+                        <Controller
+                            name="name"
+                            control={control}
+                            defaultValue=""
+                            render={({ field }) => (
+                                <TextField
+                                    {...field}
+                                    type="text"
+                                    fullWidth
+                                    margin="normal"
+                                    required
+                                    size="small"
+                                />
+                            )}
+                        />
+                    </Box>
+                    <Box mb={2}>
+                        <InputLabel>Product Image</InputLabel>
+                        <Controller
+                            name="image"
+                            control={control}
+                            render={({ field }) => (
+                                <TextField
+                                    type="file"
+                                    variant="outlined"
+                                    onChange={(e) => {
+                                        const fileUrl = URL.createObjectURL(e.target.files[0]);
+                                        field.onChange(fileUrl)
+                                    }}
+                                    margin="normal"
+                                    inputProps={{
+                                        accept: "image/*", // Limit file selection to images
+                                    }}
+                                    fullWidth
+                                    size="small"
+                                />
+                            )}
+                        />
+                    </Box>
+                    <Box mb={2}>
+                        <InputLabel>Description</InputLabel>
+                        <Controller
+                            name="description"
+                            control={control}
+                            defaultValue=""
+                            render={({ field }) => (
+                                <TextField
+                                    {...field}
+
+                                    type="text"
+                                    fullWidth
+                                    margin="normal"
+                                    required
+                                    rows={4} // 
+                                    multiline
+                                    sx={{
+                                        '& .MuiOutlinedInput-root': {
+                                            maxHeight: 'max-content !important',
+                                            height: "auto !important"
+                                        },
+                                 
+                                    }}
+                                />
+                            )}
+                        />
+                    </Box>
+                    <Box mb={2}>
+
+                        {features.map((feature, index) => (
+                            <Controller
+                                key={index}
+                                name={`features[${index}].value`}
+                                control={control}
+                                render={({ field }) => (
+                                    <>
+                                        <InputLabel>{features[index].key}</InputLabel>
+                                        <TextField
+                                            {...field}
+
+                                            fullWidth
+                                            margin="normal"
+                                            value={feature.value}
+                                            onChange={(e) => updateFeature(index, e.target.value)}
+                                        />
+                                    </>
+                                )}
                             />
-                        )}
-                    />
-                    <InputLabel>Product Image</InputLabel>
-                    <Controller
-                        name="image"
-                        control={control}
-                        render={({ field }) => (
-                            <TextField
-                                type="file"
-                                variant="outlined"
-                                onChange={(e) => {
-                                    const fileUrl = URL.createObjectURL(e.target.files[0]);
-                                    field.onChange(fileUrl)
-                                }}
-                                inputProps={{
-                                    accept: "image/*", // Limit file selection to images
-                                }}
-                                fullWidth
-                                size="small"
-                            />
-                        )}
-                    />
-
-                    <InputLabel>Description</InputLabel>
-                    <Controller
-                        name="description"
-                        control={control}
-                        defaultValue=""
-                        render={({ field }) => (
-                            <TextField
-                                {...field}
-
-                                type="text"
-                                fullWidth
-                                margin="normal"
-                                required
-                                rows={4} // 
-                                multiline
-                                sx={{
-                                    '& .MuiOutlinedInput-root': {
-                                        maxHeight: 'max-content !important',
-                                        height: "auto !important"
-                                    },
-                                    margin: 0
-                                }}
-                            />
-                        )}
-                    />
-
-                    {/* <InputLabelX label="Category"
-                        htmlFor={"category"} /> */}
-
-
-
-                    <InputLabel>Material</InputLabel>
-                    <Controller
-                        name="material"
-                        control={control}
-                        defaultValue=""
-                        render={({ field }) => (
-                            <TextField
-                                {...field}
-                                sx={{ margin: 0 }}
-                                type="text"
-                                fullWidth
-                                margin="normal"
-                                required
-                                size="small"
-                            />
-                        )}
-                    />
-
-
-                    <InputLabel>Size</InputLabel>
-                    <Controller
-                        name="size"
-                        control={control}
-                        defaultValue=""
-                        render={({ field }) => (
-                            <TextField
-                                {...field}
-                                sx={{ margin: 0 }}
-                                type="text"
-                                fullWidth
-                                margin="normal"
-                                required
-                                size="small"
-                            />
-                        )}
-                    />
-
-                    <InputLabel>Brand</InputLabel>
-                    <Controller
-                        name="brand"
-                        control={control}
-                        defaultValue=""
-                        render={({ field }) => (
-                            <TextField
-                                {...field}
-                                sx={{ m: 0 }}
-                                type="text"
-                                fullWidth
-                                margin="normal"
-                                required
-                                size="small"
-                            />
-                        )}
-                    />
-
+                        ))}
+                    </Box>
                     <Button type="submit" variant="contained" color="primary" fullWidth sx={{ marginTop: "40px" }}>
                         Submit
                     </Button>

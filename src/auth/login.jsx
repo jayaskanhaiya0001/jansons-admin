@@ -63,11 +63,10 @@ const Login = () => {
 
     try {
       const response = await axios.post("https://jainsons-pvt.vercel.app/api/auth/signin", data);
-      console.log(response, 'response')
-      if (response.data) {
+      if (response?.status === 200) {
+        navigate('/dashboard')
         setSuccessMsg("Login successful!");
         localStorage.setItem("token", response.data.token);
-        navigator('/dashboard')
       } else {
         setErrorMsg("Invalid credentials. Please try again.");
       }
