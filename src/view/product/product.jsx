@@ -19,6 +19,7 @@ import {
 
 import { Delete, Edit } from '@mui/icons-material';
 import { useForm, Controller } from "react-hook-form";
+import DeleteIcon from '@mui/icons-material/Delete';
 import axios from "axios";
 // import { InputAsterisk } from "../../component/label/InputLabels";
 const CustomButton = styled(Button)(({ theme }) => ({
@@ -117,7 +118,7 @@ const Product = () => {
             material: "",
             size: "",
             brand: "",
-            image: null,
+            image: [],
             features: [{
                 key: "Material",
                 value: ''
@@ -133,6 +134,26 @@ const Product = () => {
             ]
         }
     });
+
+    const images = watch("image");
+
+    // Function to handle image selection
+    const handleImageChange = (e) => {
+        const selectedFiles = Array.from(e.target.files);
+
+        // Generate URLs and store them
+        const newImageUrls = selectedFiles.map((file) => URL.createObjectURL(file));
+    
+        setValue("images", [...images, ...newImageUrls]);
+    
+    };
+
+
+    // Function to remove an image from the list
+    const removeImage = (index) => {
+        const updatedImages = images.filter((_, i) => i !== index);
+        setValue("image", updatedImages);
+    };
 
     useEffect(() => {
         const storedData = JSON.parse(localStorage.getItem('productData')) || [];
@@ -241,7 +262,7 @@ const Product = () => {
         getAllCategory()
     }, [])
 
-    console.log(categories, 'categories')
+    console.log(images , 'images 1212')
     return (
         <div style={{ height: "100%" }}>
             <Box display={'flex'} flex={1} justifyContent={'space-between'} mb={4} pt={4} px={4}>
@@ -330,14 +351,11 @@ const Product = () => {
                         <Controller
                             name="image"
                             control={control}
-                            render={({ field }) => (
+                            render={() => (
                                 <TextField
                                     type="file"
                                     variant="outlined"
-                                    onChange={(e) => {
-                                        const fileUrl = URL.createObjectURL(e.target.files[0]);
-                                        field.onChange(fileUrl)
-                                    }}
+                                    onChange={handleImageChange}
                                     margin="normal"
                                     inputProps={{
                                         accept: "image/*", // Limit file selection to images
@@ -347,6 +365,17 @@ const Product = () => {
                                 />
                             )}
                         />
+                    </Box>
+                    <Box mt={2}>
+                        {images && images?.length > 0 && images?.map((img, index) => (
+                            <Box key={index} display="flex" alignItems="center" gap={2} mb={1}>
+                                {console.log(img , 'IMG')}
+                                <img src={img} />
+                                <IconButton color="error" onClick={() => removeImage(index)}>
+                                    <DeleteIcon />
+                                </IconButton>
+                            </Box>
+                        ))}
                     </Box>
                     <Box mb={2}>
                         <InputLabel>Description</InputLabel>
@@ -369,13 +398,13 @@ const Product = () => {
                                             maxHeight: 'max-content !important',
                                             height: "auto !important"
                                         },
-                                 
+
                                     }}
                                 />
                             )}
                         />
                     </Box>
-                    <Box mb={2}>
+                    <Box>
 
                         {features.map((feature, index) => (
                             <Controller
@@ -387,7 +416,6 @@ const Product = () => {
                                         <InputLabel>{features[index].key}</InputLabel>
                                         <TextField
                                             {...field}
-
                                             fullWidth
                                             margin="normal"
                                             value={feature.value}
