@@ -35,54 +35,54 @@ const Dashboard = () => {
 
   const [isContentVisible, setIsContentVisible] = useState('');
 
-  const setVisibleContent = (st) =>{
+  const setVisibleContent = (st) => {
     //console.log('st: ', st);
     setIsContentVisible(st);
   }
 
   // Fetch data from API
-  useEffect( () => {
+  useEffect(() => {
 
     const fetchData = async () => {
       const getData = async (url) => {
         const getToken = localStorage.getItem('token');
         //console.log('The token is: ', getToken);
-  
+
         try {
           const response = await axios.get(url, {
             headers: {
               Authorization: `Bearer ${getToken}`, // Add the token to the Authorization header
             },
           });
-  
+
           return response.data.data;
         } catch (error) {
           console.error('Error fetching data from:', url, error);
           return null; // Return null or handle the error properly
         }
       };
-  
+
       const tempData1 = await getData('https://jainsons-pvt.vercel.app/api/product/getAll');
       const tempData2 = await getData('https://jainsons-pvt.vercel.app/api/quotes/getAll');
       const tempData3 = await getData('https://jainsons-pvt.vercel.app/api/contactUs/showAll');
       const tempData4 = await getData('https://jainsons-pvt.vercel.app/api/categories/showAll');
 
       console.log('temp: ', tempData4);
-  
+
       setProductData(tempData1);
       setQuoteData(tempData2);
       setcontactUsData(tempData3);
       setcategoryData(tempData4);
     };
-  
+
     fetchData(); // Call the async function
-  }, []); 
+  }, []);
 
   const forgetThese = ['_id', 'img', 'imageURLs', '__v']
 
-  const getCategory = (catId) =>{
-    if(categoryData){
-      const catF = categoryData.find((cat)=>
+  const getCategory = (catId) => {
+    if (categoryData) {
+      const catF = categoryData.find((cat) =>
         cat._id == catId
       )
       return catF.name;
@@ -104,27 +104,27 @@ const Dashboard = () => {
         <Table>
           <TableHead>
             <TableRow>
-              {Object.keys(data[0] || {}).map((key, index) => {
-                return !forgetThese.includes(key)? 
+              {Object.keys(data[0] || {})?.map((key, index) => {
+                return !forgetThese?.includes(key) ?
                   <TableCell key={index}>
-                    
+
                     {key == 'createdAt' ? 'CREATED AT' : key == 'updatedAt' ? 'UPDATED AT' : key.toUpperCase()}
                   </TableCell>
-                : null
+                  : null
               })}
             </TableRow>
           </TableHead>
           <TableBody>
-            {data.map((item, index) => (
+            {data?.map((item, index) => (
               <TableRow key={index}>
-                
-                {Object.entries(item || {}).map(([key, value], idx) => 
+
+                {Object.entries(item || {})?.map(([key, value], idx) =>
                   // Only render cells if the key is not in the 'forgetThese' array
                   !forgetThese.includes(key) ? (
                     <TableCell key={idx}>
                       {typeof value === 'object' ? transformData(value)
-                       : 
-                       key !== 'category' ? value: getCategory(value)}
+                        :
+                        key !== 'category' ? value : getCategory(value)}
                     </TableCell>
                   ) : null
                 )}
@@ -143,45 +143,45 @@ const Dashboard = () => {
         Dashboard
       </Typography>
       <Grid container spacing={3}>
-        
+
         <Grid item xs={12} md={3}>
-          <Paper elevation={3} sx={{ p: 2, textAlign: 'center' }}>
+          <Paper elevation={3} sx={{ p: 2, textAlign: 'center' }} onClick={() =>productData?.length > 0 && setVisibleContent('products')}>
             <Typography variant="h6">Total Products</Typography>
             {/* <Typography variant="h4" color="primary">{productData?.length}</Typography> */}
             <Typography variant="h4" color="primary">
-              <span onClick={ () => setVisibleContent('products')}>{productData?.length}</span>
-              
+              <span >{productData?.length || 0}</span>
+
             </Typography>
           </Paper>
         </Grid>
         <Grid item xs={12} md={3}>
-          <Paper elevation={3} sx={{ p: 2, textAlign: 'center' }}>
+          <Paper elevation={3} sx={{ p: 2, textAlign: 'center' }} onClick={() =>  categoryData?.length > 0 &&  setVisibleContent('categories')}>
             <Typography variant="h6">Total Categories</Typography>
             {/* <Typography variant="h4" color="secondary">{categoryData?.length}</Typography> */}
             <Typography variant="h4" color="secondary">
-              <span onClick={ () => setVisibleContent('categories')}>{categoryData?.length}</span>
-              
-              </Typography>
+              <span >{categoryData?.length || 0}</span>
+
+            </Typography>
           </Paper>
         </Grid>
         <Grid item xs={12} md={3}>
-          <Paper elevation={3} sx={{ p: 2, textAlign: 'center' }}>
+          <Paper elevation={3} sx={{ p: 2, textAlign: 'center' }} onClick={() => contactUsData?.length > 0 && setVisibleContent('contacts')}>
             <Typography variant="h6">New Contacts</Typography>
             {/* <Typography variant="h4" color="tertiary">{contactUsData?.length}</Typography> */}
             <Typography variant="h4" color="tertiary">
-              <span onClick={ () => setVisibleContent('contacts')}>{contactUsData?.length}</span>
-              
-              
-              </Typography>
+              <span >{contactUsData?.length || 0}</span>
+
+
+            </Typography>
           </Paper>
         </Grid>
         <Grid item xs={12} md={3}>
-          <Paper elevation={3} sx={{ p: 2, textAlign: 'center' }}>
+          <Paper elevation={3} sx={{ p: 2, textAlign: 'center' }} onClick={() => quoteData?.length > 0 && setVisibleContent('quotes')} >
             <Typography variant="h6">New Quotes</Typography>
             {/* <Typography variant="h4" color="error">{quoteData?.length}</Typography> */}
             <Typography variant="h4" color="error">
-              <span onClick={ () => setVisibleContent('quotes')}>{quoteData?.length}</span>
-              
+              <span >{quoteData?.length || 0}</span>
+
             </Typography>
           </Paper>
         </Grid>

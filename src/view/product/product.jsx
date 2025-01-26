@@ -101,24 +101,14 @@ const Product = () => {
     const token = localStorage.getItem('token')
     const [drawerOpen, setDrawerOpen] = useState(false);
     const [categories, setCategories] = useState([])
-    const [editorData, setEditorData] = useState("");
-    // const [products, setProducts] = useState([]);
-
-    const [categoryList, setCategoryList] = useState(categories);
     const [productData, setProductData] = useState([]);
-    // Add new category
-
 
     const { handleSubmit, control, reset, setValue, watch } = useForm({
         defaultValues: {
             newCategory: "",
-            title: "",
-            description: "",
+            name: "",
             category: "",
-            material: "",
-            size: "",
-            brand: "",
-            image: [],
+            photos: [],
             features: [{
                 key: "Material",
                 value: ''
@@ -135,67 +125,95 @@ const Product = () => {
         }
     });
 
-    const images = watch("image");
-
+    const images = watch("photos");
+    const newCategory = watch("newCategory");
     // Function to handle image selection
     const handleImageChange = (e) => {
         const selectedFiles = Array.from(e.target.files);
 
         // Generate URLs and store them
-        const newImageUrls = selectedFiles.map((file) => URL.createObjectURL(file));
-    
-        setValue("images", [...images, ...newImageUrls]);
-    
+        const convertToBase64 = (file) => {
+            return new Promise((resolve, reject) => {
+                const reader = new FileReader();
+                reader.readAsDataURL(file);
+                reader.onload = () => resolve(reader.result);
+                reader.onerror = (error) => reject(error);
+            });
+        };
+        Promise.all(selectedFiles.map(file => convertToBase64(file)))
+            .then(base64Images => {
+                setValue("photos", [...images, ...base64Images]);
+            })
+            .catch(error => console.error('Error converting images:', error));
+
     };
 
 
     // Function to remove an image from the list
     const removeImage = (index) => {
         const updatedImages = images.filter((_, i) => i !== index);
-        setValue("image", updatedImages);
+        setValue("photos", updatedImages);
     };
+
+
+    const getAllProduct = async () => {
+        try {
+            const response = await axios.get("https://jainsons-pvt.vercel.app/api/product/getAll", {
+                headers: {
+                    Authorization: `Bearer ${token}`
+                }
+            });
+            if (response.data) {
+                setProductData(response.data?.data)
+            } else {
+                //   setErrorMsg("Invalid credentials. Please try again.");
+            }
+        } catch (error) {
+            // setErrorMsg("Error logging in. Please check your credentials.");
+        } finally {
+            // setLoading(false);
+        }
+    }
 
     useEffect(() => {
-        const storedData = JSON.parse(localStorage.getItem('productData')) || [];
-        setProductData(storedData);
+        getAllProduct()
     }, []);
 
-    const onSubmit = (data) => {
-        const updatedData = [...productData, data];
-        setProductData(updatedData);
-        localStorage.setItem('productData', JSON.stringify(updatedData));
-        reset()
-    };
+    const onSubmit = async (data) => {
+        const formData = new FormData();
 
-    const [events, setEvents] = useState([]);
+        // formData.append("newCategory", defaultValues.newCategory);
+        formData.append("name", data.name);
+        formData.append("category", data.category);
 
-    const handleFileChange = (event) => {
-        const file = event.target.files[0];
-        if (file) {
-            // You can store the file in a separate state if needed, or process it
-            console.log(file); // Debugging
-
-            // Optionally update the form state with the file's name or a file URL
-            setValue('image', file.name); // If you want to store only the file name
+        // Append image files
+        if (data.photos.length > 0) {
+            data.photos.forEach((file, index) => {
+                formData.append(`photos[${index}]`, file);
+            });
         }
+
+        // Append features
+        data.features.forEach((feature, index) => {
+            formData.append(`features[${index}][key]`, feature.key);
+            formData.append(`features[${index}][value]`, feature.value);
+        });
+
+        // Example API call using axios
+        await axios.post('https://jainsons-pvt.vercel.app/api/product/add', formData, {
+            headers: {
+                Authorization: `Bearer ${token}`
+            }
+        })
+            .then(response =>{
+                getAllProduct()
+            })
+            .catch(error => console.error('Error:', error));
+
     };
 
-    const logEvent = (evt) => {
-        evt.timestamp = new Intl.DateTimeFormat('en', {
-            hour12: false,
-            hour: '2-digit',
-            minute: '2-digit',
-            second: '2-digit'
-        }).format(new Date());
 
-        setEvents(events => [evt, ...events]);
-    }
 
-    const clearEvents = () => {
-        setEvents([]);
-    }
-
-    const newCategory = watch("newCategory");
 
     const getAllCategory = async () => {
         try {
@@ -224,7 +242,7 @@ const Product = () => {
             });
 
             if (response.data) {
-                // navigator('/dashboard')
+                getAllCategory()
             } else {
                 //   setErrorMsg("Invalid credentials. Please try again.");
             }
@@ -250,11 +268,8 @@ const Product = () => {
         setProductData(updatedData);
         localStorage.setItem('productData', JSON.stringify(updatedData));
     };
-
-    // Handle edit product
     const handleEdit = (index) => {
         const product = productData[index];
-        //@ts-ignore
         Object.keys(product).forEach(key => setValue(key, product[key]));
     };
 
@@ -262,7 +277,6 @@ const Product = () => {
         getAllCategory()
     }, [])
 
-    console.log(images , 'images 1212')
     return (
         <div style={{ height: "100%" }}>
             <Box display={'flex'} flex={1} justifyContent={'space-between'} mb={4} pt={4} px={4}>
@@ -349,7 +363,7 @@ const Product = () => {
                     <Box mb={2}>
                         <InputLabel>Product Image</InputLabel>
                         <Controller
-                            name="image"
+                            name="photos"
                             control={control}
                             render={() => (
                                 <TextField
@@ -369,15 +383,15 @@ const Product = () => {
                     <Box mt={2}>
                         {images && images?.length > 0 && images?.map((img, index) => (
                             <Box key={index} display="flex" alignItems="center" gap={2} mb={1}>
-                                {console.log(img , 'IMG')}
-                                <img src={img} />
+                                {console.log(img, 'IMG')}
+                                <img src={img} height={'100px'} width={'100px'} />
                                 <IconButton color="error" onClick={() => removeImage(index)}>
                                     <DeleteIcon />
                                 </IconButton>
                             </Box>
                         ))}
                     </Box>
-                    <Box mb={2}>
+                    {/* <Box mb={2}>
                         <InputLabel>Description</InputLabel>
                         <Controller
                             name="description"
@@ -403,7 +417,7 @@ const Product = () => {
                                 />
                             )}
                         />
-                    </Box>
+                    </Box> */}
                     <Box>
 
                         {features.map((feature, index) => (
@@ -431,30 +445,29 @@ const Product = () => {
                     </Button>
                 </form>
             </Drawer>
-            <Grid container spacing={3}>
+            <Grid container spacing={3} px={4}>
                 {productData.map((product, index) => (
-                    <Grid item xs={12} sm={6} md={4} key={index}>
+                    <Grid item xs={12} sm={6} md={4} key={index} >
                         <Card>
                             <CardContent>
-                                <Typography variant="h6">{product.title}</Typography>
-                                <Typography variant="body2">{product.description}</Typography>
-                                <Typography variant="body2">Category: {product.category}</Typography>
-                                <Typography variant="body2">Material: {product.material}</Typography>
-                                <Typography variant="body2">Size: {product.size}</Typography>
-                                <Typography variant="body2">Brand: {product.brand}</Typography>
+                                <Typography variant="h6">{product?.name}</Typography>
+                                <Typography variant="body2">{product?.description}</Typography>
+                                {
+                                    product?.features?.map((data) => <Typography variant="body2">{data?.key}: {data?.value}</Typography>)
+                                }
                                 <Box sx={{ mt: 2 }}>
                                     {product?.image && <img src={product?.image} alt="product" style={{ maxWidth: '100%' }} />}
                                 </Box>
 
                                 {/* Edit and Delete buttons */}
-                                <Box sx={{ display: 'flex', justifyContent: 'space-between', mt: 2 }}>
+                                {/* <Box sx={{ display: 'flex', justifyContent: 'space-between', mt: 2 }}>
                                     <IconButton onClick={() => { handleEdit(index); setDrawerOpen(true) }} color="primary">
                                         <Edit />
                                     </IconButton>
                                     <IconButton onClick={() => handleDelete(index)} color="secondary">
                                         <Delete />
                                     </IconButton>
-                                </Box>
+                                </Box> */}
                             </CardContent>
                         </Card>
                     </Grid>
