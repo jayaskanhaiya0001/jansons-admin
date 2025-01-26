@@ -129,23 +129,25 @@ const Product = () => {
     const newCategory = watch("newCategory");
     // Function to handle image selection
     const handleImageChange = (e) => {
+        // const selectedFiles = Array.from(e.target.files);
+
         const selectedFiles = Array.from(e.target.files);
+        setValue("photos", selectedFiles); 
 
         // Generate URLs and store them
-        const convertToBase64 = (file) => {
-            return new Promise((resolve, reject) => {
-                const reader = new FileReader();
-                reader.readAsDataURL(file);
-                reader.onload = () => resolve(reader.result);
-                reader.onerror = (error) => reject(error);
-            });
-        };
-        Promise.all(selectedFiles.map(file => convertToBase64(file)))
-            .then(base64Images => {
-                setValue("photos", [...images, ...base64Images]);
-            })
-            .catch(error => console.error('Error converting images:', error));
-
+        // const convertToBase64 = (file) => {
+        //     return new Promise((resolve, reject) => {
+        //         const reader = new FileReader();
+        //         reader.readAsDataURL(file);
+        //         reader.onload = () => resolve(reader.result);
+        //         reader.onerror = (error) => reject(error);
+        //     });
+        // };
+        // Promise.all(selectedFiles.map(file => convertToBase64(file)))
+        //     .then(base64Images => {
+        //         setValue("photos", [...images, ...base64Images]);
+        //     })
+        //     .catch(error => console.error('Error converting images:', error));
     };
 
 
@@ -189,7 +191,7 @@ const Product = () => {
         // Append image files
         if (data.photos.length > 0) {
             data.photos.forEach((file, index) => {
-                formData.append(`photos[${index}]`, file);
+                formData.append('photos', file);
             });
         }
 
@@ -372,8 +374,10 @@ const Product = () => {
                                     variant="outlined"
                                     onChange={handleImageChange}
                                     margin="normal"
+                                
                                     inputProps={{
                                         accept: "image/*", // Limit file selection to images
+                                        multiple: true                                        
                                     }}
                                     fullWidth
                                     size="small"
