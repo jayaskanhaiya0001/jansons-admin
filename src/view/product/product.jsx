@@ -21,6 +21,8 @@ import { Delete, Edit } from '@mui/icons-material';
 import { useForm, Controller } from "react-hook-form";
 import DeleteIcon from '@mui/icons-material/Delete';
 import axios from "axios";
+import { toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 // import { InputAsterisk } from "../../component/label/InputLabels";
 const CustomButton = styled(Button)(({ theme }) => ({
     padding: '8px 16px !important',
@@ -132,7 +134,7 @@ const Product = () => {
         // const selectedFiles = Array.from(e.target.files);
 
         const selectedFiles = Array.from(e.target.files);
-        setValue("photos", selectedFiles); 
+        setValue("photos", selectedFiles);
 
         // Generate URLs and store them
         // const convertToBase64 = (file) => {
@@ -209,7 +211,17 @@ const Product = () => {
             }
         })
             .then(response => {
+                toast.success('Product Add successfully!', {
+                    position: 'top-center',
+                    autoClose: 3000, // Closes after 3 seconds
+                    hideProgressBar: false,
+                    closeOnClick: true,
+                    pauseOnHover: true,
+                    draggable: true,
+                });
+                reset()
                 getAllProduct()
+                setDrawerOpen(false)
             })
             .catch(error => console.error('Error:', error));
 
@@ -268,18 +280,29 @@ const Product = () => {
 
     const handleDelete = async (id) => {
         try {
-            const response = await axios.delete("https://jainsons-pvt.vercel.app/api/product/delete", {
-                id: id
-            }, {
-                headers: {
-                    Authorization: `Bearer ${token}`,
-                    'Content-Type': 'application/json',
-
-
+            const response = await axios.delete("https://jainsons-pvt.vercel.app/api/product/delete",
+                {
+                    data: {
+                        id: id
+                    },
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${token}`
+                    }
                 }
-            });
 
-            if (response.data) {
+
+            );
+            console.log(response, 'response 1212')
+            if (response.status === 200) {
+                toast.success('Product deleted successfully!', {
+                    position: 'top-center',
+                    autoClose: 3000, // Closes after 3 seconds
+                    hideProgressBar: false,
+                    closeOnClick: true,
+                    pauseOnHover: true,
+                    draggable: true,
+                });
                 getAllCategory()
             } else {
                 //   setErrorMsg("Invalid credentials. Please try again.");
@@ -394,10 +417,10 @@ const Product = () => {
                                     variant="outlined"
                                     onChange={handleImageChange}
                                     margin="normal"
-                                
+
                                     inputProps={{
                                         accept: "image/*", // Limit file selection to images
-                                        multiple: true                                        
+                                        multiple: true
                                     }}
                                     fullWidth
                                     size="small"
