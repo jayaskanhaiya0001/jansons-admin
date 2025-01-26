@@ -4,8 +4,6 @@ import Dashboard from './view/dashboard/dashboard';
 import Product from './view/product/product';
 import Login from './auth/login';
 import ProtectedRoute from './protected-route';
-
-
 import './App.css';
 
 
