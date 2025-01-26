@@ -385,7 +385,7 @@ const Product = () => {
                             )}
                         />
                     </Box>
-                    <Box mt={2}>
+                    {/* <Box mt={2}>
                         {images && images?.length > 0 && images?.map((img, index) => (
                             <Box key={index} display="flex" alignItems="center" gap={2} mb={1}>
                                 {console.log(img, 'IMG')}
@@ -395,7 +395,7 @@ const Product = () => {
                                 </IconButton>
                             </Box>
                         ))}
-                    </Box>
+                    </Box> */}
                     {/* <Box mb={2}>
                         <InputLabel>Description</InputLabel>
                         <Controller
