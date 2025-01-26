@@ -206,7 +206,7 @@ const Product = () => {
                 'Content-Type': 'multipart/form-data',
             }
         })
-            .then(response =>{
+            .then(response => {
                 getAllProduct()
             })
             .catch(error => console.error('Error:', error));
@@ -264,10 +264,30 @@ const Product = () => {
         setValue("features", updatedFeatures);
     };
 
-    const handleDelete = (index) => {
-        const updatedData = productData.filter((_, i) => i !== index);
-        setProductData(updatedData);
-        localStorage.setItem('productData', JSON.stringify(updatedData));
+    const handleDelete = async (id) => {
+        try {
+            const response = await axios.delete("https://jainsons-pvt.vercel.app/api/product/delete", {
+                id: id
+            }, {
+                headers: {
+                    Authorization: `Bearer ${token}`,
+                    'Content-Type': 'application/json',
+
+
+                }
+            });
+
+            if (response.data) {
+                getAllCategory()
+            } else {
+                //   setErrorMsg("Invalid credentials. Please try again.");
+            }
+        } catch (error) {
+            // setErrorMsg("Error logging in. Please check your credentials.");
+        } finally {
+            // setLoading(false);
+        }
+
     };
     const handleEdit = (index) => {
         const product = productData[index];
@@ -450,6 +470,7 @@ const Product = () => {
                 {productData.map((product, index) => (
                     <Grid item xs={12} sm={6} md={4} key={index} >
                         <Card>
+                            {console.log(product, 'product')}
                             <CardContent>
                                 <Typography variant="h6">{product?.name}</Typography>
                                 <Typography variant="body2">{product?.description}</Typography>
@@ -461,14 +482,14 @@ const Product = () => {
                                 </Box>
 
                                 {/* Edit and Delete buttons */}
-                                {/* <Box sx={{ display: 'flex', justifyContent: 'space-between', mt: 2 }}>
+                                <Box sx={{ display: 'flex', justifyContent: 'space-between', mt: 2 }}>
                                     <IconButton onClick={() => { handleEdit(index); setDrawerOpen(true) }} color="primary">
                                         <Edit />
                                     </IconButton>
-                                    <IconButton onClick={() => handleDelete(index)} color="secondary">
+                                    <IconButton onClick={() => handleDelete(product?._id)} color="secondary">
                                         <Delete />
                                     </IconButton>
-                                </Box> */}
+                                </Box>
                             </CardContent>
                         </Card>
                     </Grid>
