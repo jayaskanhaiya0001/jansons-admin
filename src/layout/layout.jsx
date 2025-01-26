@@ -18,6 +18,7 @@ import AccountCircleIcon from "@mui/icons-material/AccountCircle";
 import { Outlet, useNavigate } from "react-router-dom";
 import { Button, Popover, Stack } from "@mui/material";
 import LogoutIcon from "@mui/icons-material/Logout";
+import { toast } from "react-toastify";
 
 
 const drawerWidth = 240;
@@ -87,8 +88,17 @@ export default function FullLayout() {
         setOpen(!open);
     };
 
-    const logout = async () => {
-
+    const logout = () => {
+        localStorage.clear()
+        toast.success('Logout successfully', {
+            position: 'top-center',
+            autoClose: 3000, // Closes after 3 seconds
+            hideProgressBar: false,
+            closeOnClick: true,
+            pauseOnHover: true,
+            draggable: true,
+        })
+        navigate('/login')
     };
     return (
         <ThemeProvider theme={defaultTheme}>
