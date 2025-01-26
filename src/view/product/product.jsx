@@ -202,7 +202,8 @@ const Product = () => {
         // Example API call using axios
         await axios.post('https://jainsons-pvt.vercel.app/api/product/add', formData, {
             headers: {
-                Authorization: `Bearer ${token}`
+                Authorization: `Bearer ${token}`,
+                'Content-Type': 'multipart/form-data',
             }
         })
             .then(response =>{
