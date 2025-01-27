@@ -178,6 +178,7 @@ export default function FullLayout() {
                             px: [1],
                         }}
                     >
+                        <img src="/logo.png" style={{height: "40px", width: "100%" ,margin: "0 auto", objectFit:'contain'}}/>
                         <IconButton onClick={toggleDrawer}>
                             <ChevronLeftIcon />
                         </IconButton>
