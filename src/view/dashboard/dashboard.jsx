@@ -32,7 +32,8 @@ const Dashboard = () => {
   const [quoteData, setQuoteData] = useState();
   const [contactUsData, setcontactUsData] = useState();
   const [categoryData, setcategoryData] = useState();
-
+  const [monthlyQuotes, setMonthlyQuotes] = useState([])
+  const [monthlyEnquiry, setMonthlyEnquiry] = useState([])
   const [isContentVisible, setIsContentVisible] = useState('');
   const navigate = useNavigate()
   const setVisibleContent = (st) => {
@@ -66,6 +67,8 @@ const Dashboard = () => {
       const tempData2 = await getData('https://jainsons-pvt.vercel.app/api/quotes/getAll');
       const tempData3 = await getData('https://jainsons-pvt.vercel.app/api/contactUs/showAll');
       const tempData4 = await getData('https://jainsons-pvt.vercel.app/api/categories/showAll');
+      // const monthlyQuote = await getData('https://jainsons-pvt.vercel.app/api/quotes/getAll?monthlyData=true');
+      // console.log(monthlyQuote , 'monthlyQuote')
       setProductData(tempData1);
       setQuoteData(tempData2);
       setcontactUsData(tempData3);
@@ -75,27 +78,61 @@ const Dashboard = () => {
     fetchData();
   }, []);
 
+  useEffect(() => {
+    const getData = async (url) => {
+      const getToken = localStorage.getItem('token');
+      try {
+        const response = await axios.get('https://jainsons-pvt.vercel.app/api/quotes/getAll?monthlyData=true', {
+          headers: {
+            Authorization: `Bearer ${getToken}`, // Add the token to the Authorization header
+          },
+        });
+        const response1 = await axios.get('https://jainsons-pvt.vercel.app/api/contactUs/showAll?monthlyData=true', {
+          headers: {
+            Authorization: `Bearer ${getToken}`, // Add the token to the Authorization header
+          },
+        });
+        console.log(response, 'response')
+        if (response?.data?.monthlyCounts) {
+          setMonthlyQuotes(response?.data?.monthlyCounts)
+        }
+        // console.log(response1?.data?.monthlyCounts , 'response1?.data?.monthlyCounts')
+        if (response1?.data?.monthlyCounts) {
+          setMonthlyEnquiry(response1?.data?.monthlyCounts)
+        }
+        // return response.data.data;
+      } catch (error) {
+        console.error('Error fetching data from:', url, error);
+        return null; // Return null or handle the error properly
+      }
+    };
+    getData()
+  }, [])
+
+  console.log(monthlyEnquiry , 'monthlyEnquiry')
   const productData1 = {
-    labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'],
+    labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', "Aug", 'Sep', "Oct", 'Nov', "Dec"],
     datasets: [
       {
-        label: 'Products Sold',
-        data: [150, 200, 180, 220, 300, 250],
+        label: 'Monthly Quotations',
+        data: monthlyQuotes,
         backgroundColor: '#1976d2',
       },
     ],
   };
 
   const inquiryData = {
-    labels: ['Pending', 'Resolved', 'Archived'],
+    labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', "Aug", 'Sep', "Oct", 'Nov', "Dec"],
     datasets: [
       {
         label: 'Inquiries',
-        data: [20, 45, 10],
+        data: monthlyEnquiry,
         backgroundColor: ['#ff9800', '#4caf50', '#9e9e9e'],
       },
     ],
   };
+
+
 
   // const forgetThese = ['_id', 'img', 'imageURLs', '__v']
 
@@ -156,26 +193,27 @@ const Dashboard = () => {
   //   );
   // };
 
+  console.log(monthlyQuotes, 'monthlyQuotes')
   return (
     <Box sx={{ p: 3 }}>
       <Typography variant="h4" gutterBottom>
         Dashboard
       </Typography>
       <Grid container spacing={3}>
-      <Grid item xs={12} md={6}>
+        <Grid item xs={12} md={6}>
           <Paper elevation={3} sx={{ p: 2 }}>
-            <Typography variant="h6">Product Performance</Typography>
+            <Typography variant="h6">Monthly Quotations</Typography>
             <Bar data={productData1} options={{ responsive: true, plugins: { legend: { position: 'top' } } }} />
           </Paper>
         </Grid>
         <Grid item xs={12} md={6}>
           <Paper elevation={3} sx={{ p: 2 }}>
-            <Typography variant="h6">Inquiry Status</Typography>
+            <Typography variant="h6">Monthly Enquiry</Typography>
             <Bar data={inquiryData} options={{ responsive: true, plugins: { legend: { position: 'top' } } }} />
           </Paper>
         </Grid>
         <Grid item xs={12} md={3} onClick={() => navigate('/product')}>
-          <Paper elevation={3} sx={{ p: 2, textAlign: 'center' }} onClick={() =>productData?.length > 0 && setVisibleContent('products')}>
+          <Paper elevation={3} sx={{ p: 2, textAlign: 'center' }} onClick={() => productData?.length > 0 && setVisibleContent('products')}>
             <Typography variant="h6">Total Products</Typography>
             {/* <Typography variant="h4" color="primary">{productData?.length}</Typography> */}
             <Typography variant="h4" color="primary">
@@ -185,7 +223,7 @@ const Dashboard = () => {
           </Paper>
         </Grid>
         <Grid item xs={12} md={3} onClick={() => navigate('/category')}>
-          <Paper elevation={3} sx={{ p: 2, textAlign: 'center' }} onClick={() =>  categoryData?.length > 0 &&  setVisibleContent('categories')}>
+          <Paper elevation={3} sx={{ p: 2, textAlign: 'center' }} onClick={() => categoryData?.length > 0 && setVisibleContent('categories')}>
             <Typography variant="h6">Total Categories</Typography>
             {/* <Typography variant="h4" color="secondary">{categoryData?.length}</Typography> */}
             <Typography variant="h4" color="secondary">
