@@ -196,7 +196,7 @@ const Dashboard = () => {
         </Grid>
         <Grid item xs={12} md={3} onClick={() => navigate('/enquiry')}>
           <Paper elevation={3} sx={{ p: 2, textAlign: 'center' }} onClick={() => contactUsData?.length > 0 && setVisibleContent('contacts')}>
-            <Typography variant="h6">New Contacts</Typography>
+            <Typography variant="h6">New Enquiry</Typography>
             {/* <Typography variant="h4" color="tertiary">{contactUsData?.length}</Typography> */}
             <Typography variant="h4" color="tertiary">
               <span >{contactUsData?.length || 0}</span>
@@ -207,7 +207,7 @@ const Dashboard = () => {
         </Grid>
         <Grid item xs={12} md={3} onClick={() => navigate('/quotation')}>
           <Paper elevation={3} sx={{ p: 2, textAlign: 'center' }} onClick={() => quoteData?.length > 0 && setVisibleContent('quotes')} >
-            <Typography variant="h6">New Quotes</Typography>
+            <Typography variant="h6">New Quotations</Typography>
             {/* <Typography variant="h4" color="error">{quoteData?.length}</Typography> */}
             <Typography variant="h4" color="error">
               <span >{quoteData?.length || 0}</span>
