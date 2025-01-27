@@ -14,7 +14,8 @@ import {
     MenuItem,
     styled,
     IconButton,
-    InputLabel
+    InputLabel,
+    CircularProgress
 } from "@mui/material";
 
 import { Delete, Edit } from '@mui/icons-material';
@@ -104,7 +105,7 @@ const Product = () => {
     const [drawerOpen, setDrawerOpen] = useState(false);
     const [categories, setCategories] = useState([])
     const [productData, setProductData] = useState([]);
-
+    const [loading, setLoading] = useState(false);
     const { handleSubmit, control, reset, setValue, watch } = useForm({
         defaultValues: {
             newCategory: "",
@@ -161,6 +162,7 @@ const Product = () => {
 
 
     const getAllProduct = async () => {
+        setLoading(true)
         try {
             const response = await axios.get("https://jainsons-pvt.vercel.app/api/product/getAll", {
                 headers: {
@@ -175,7 +177,7 @@ const Product = () => {
         } catch (error) {
             // setErrorMsg("Error logging in. Please check your credentials.");
         } finally {
-            // setLoading(false);
+            setLoading(false);
         }
     }
 
@@ -493,35 +495,44 @@ const Product = () => {
                     </Button>
                 </form>
             </Drawer>
-            <Grid container spacing={3} px={4}>
-                {productData.map((product, index) => (
-                    <Grid item xs={12} sm={6} md={4} key={index} >
-                        <Card>
-                            {console.log(product, 'product')}
-                            <CardContent>
-                                <Typography variant="h6">{product?.name}</Typography>
-                                <Typography variant="body2">{product?.description}</Typography>
-                                {
-                                    product?.features?.map((data) => <Typography variant="body2">{data?.key}: {data?.value}</Typography>)
-                                }
-                                <Box sx={{ mt: 2 }}>
-                                    {product?.image && <img src={product?.image} alt="product" style={{ maxWidth: '100%' }} />}
-                                </Box>
+            {
+                loading ? <Box
+                    display="flex"
+                    justifyContent="center"
+                    alignItems="center"
+                    height="70vh"
+                > <CircularProgress size={48} /> </Box> :
+                    <Grid container spacing={3} px={4}>
+                        {productData.map((product, index) => (
+                            <Grid item xs={12} sm={6} md={4} key={index} >
+                                <Card>
+                                    {console.log(product, 'product')}
+                                    <CardContent>
+                                        <Typography variant="h6">{product?.name}</Typography>
+                                        <Typography variant="body2">{product?.description}</Typography>
+                                        {
+                                            product?.features?.map((data) => <Typography variant="body2">{data?.key}: {data?.value}</Typography>)
+                                        }
+                                        <Box sx={{ mt: 2 }}>
+                                            {product?.image && <img src={product?.image} alt="product" style={{ maxWidth: '100%' }} />}
+                                        </Box>
 
-                                {/* Edit and Delete buttons */}
-                                <Box sx={{ display: 'flex', justifyContent: 'space-between', mt: 2 }}>
-                                    <IconButton onClick={() => { handleEdit(index); setDrawerOpen(true) }} color="primary">
-                                        <Edit />
-                                    </IconButton>
-                                    <IconButton onClick={() => handleDelete(product?._id)} color="secondary">
-                                        <Delete />
-                                    </IconButton>
-                                </Box>
-                            </CardContent>
-                        </Card>
+                                        {/* Edit and Delete buttons */}
+                                        <Box sx={{ display: 'flex', justifyContent: 'space-between', mt: 2 }}>
+                                            <IconButton onClick={() => { handleEdit(index); setDrawerOpen(true) }} color="primary">
+                                                <Edit />
+                                            </IconButton>
+                                            <IconButton onClick={() => handleDelete(product?._id)} color="secondary">
+                                                <Delete />
+                                            </IconButton>
+                                        </Box>
+                                    </CardContent>
+                                </Card>
+                            </Grid>
+                        ))}
                     </Grid>
-                ))}
-            </Grid>
+            }
+
         </div>
     );
 };

@@ -199,7 +199,6 @@ export default function FullLayout() {
                         flexGrow: 1,
                         height: "100vh",
                         overflow: "auto",
-                        // widows: "100%"
                     }}
                 >
                     <Toolbar />

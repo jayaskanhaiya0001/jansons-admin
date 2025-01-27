@@ -5,6 +5,9 @@ import Product from './view/product/product';
 import Login from './auth/login';
 import ProtectedRoute from './protected-route';
 import { ToastContainer } from 'react-toastify';
+import Enquiry from './view/enquiry/enquiry';
+import Category from './view/category/categories';
+import Quotation from './view/quotations/quotations';
 import './App.css';
 
 
@@ -21,6 +24,9 @@ function App() {
               <Route path="/" element={<FullLayout />} >
                 <Route path="dashboard" element={<Dashboard />} />
                 <Route path="product" element={<Product />} />
+                <Route path="enquiry" element={<Enquiry />} />
+                <Route path="category" element={<Category />} />
+                <Route path="quotation" element={<Quotation />} />
               </Route>
             </Route>
           </Routes>
