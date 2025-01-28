@@ -23,12 +23,53 @@ import { useForm, Controller } from "react-hook-form";
 import DeleteIcon from '@mui/icons-material/Delete';
 import axios from "axios";
 import { toast } from 'react-toastify';
+import * as yup from "yup";
+import { yupResolver } from "@hookform/resolvers/yup";
 import 'react-toastify/dist/ReactToastify.css';
 // import { InputAsterisk } from "../../component/label/InputLabels";
 const CustomButton = styled(Button)(({ theme }) => ({
     padding: '8px 16px !important',
     height: "max-content"
 }));
+
+
+const validationSchema = yup.object().shape({
+    newCategory: yup
+        .string()
+        .nullable(),
+    name: yup
+        .string()
+        .required("Name is required")
+        .min(3, "Name must be at least 3 characters")
+        .max(50, "Name must not exceed 50 characters"),
+    category: yup
+        .string()
+        .required("Category is required"),
+    photos: yup.mixed().required('Photos is required'),
+    features: yup
+        .array()
+        .of(
+            yup.object().shape({
+                key: yup.string().required("Key is required"),
+                value: yup
+                    .string()
+                    .required("Value is required")
+                    .test(
+                        "is-alphanumeric-for-size",
+                        "Size must be alphanumeric",
+                        function (value) {
+                            // Access the "key" field for conditional validation
+                            const { key } = this.parent;
+                            if (key === "Size") {
+                                return /^[a-zA-Z0-9]+$/.test(value || "");
+                            }
+                            return true; // For other keys, no validation on format
+                        }
+                    )
+            })
+        )
+});
+
 const products = [
     {
         id: 1,
@@ -106,7 +147,7 @@ const Product = () => {
     const [categories, setCategories] = useState([])
     const [productData, setProductData] = useState([]);
     const [loading, setLoading] = useState(false);
-    const { handleSubmit, control, reset, setValue, watch } = useForm({
+    const { handleSubmit, control, reset, setValue, watch, formState: { errors }  } = useForm({
         defaultValues: {
             newCategory: "",
             name: "",
@@ -125,9 +166,10 @@ const Product = () => {
                 value: ''
             },
             ]
-        }
+        },
+        resolver: yupResolver(validationSchema)
     });
-
+    console.log(errors , 'errors')
     const images = watch("photos");
     const newCategory = watch("newCategory");
     // Function to handle image selection
@@ -259,7 +301,16 @@ const Product = () => {
             });
 
             if (response.data) {
+                
                 getAllCategory()
+                toast.success('Category added successfully!', {
+                    position: 'top-center',
+                    autoClose: 3000, // Closes after 3 seconds
+                    hideProgressBar: false,
+                    closeOnClick: true,
+                    pauseOnHover: true,
+                    draggable: true,
+                });
             } else {
                 //   setErrorMsg("Invalid credentials. Please try again.");
             }
@@ -324,7 +375,7 @@ const Product = () => {
     useEffect(() => {
         getAllCategory()
     }, [])
-
+    console.log(watch() , 'Watch list')
     return (
         <div style={{ height: "100%" }}>
             <Box display={'flex'} flex={1} justifyContent={'space-between'} mb={4} pt={4} px={4}>
@@ -374,21 +425,25 @@ const Product = () => {
                             control={control}
                             defaultValue=""
                             render={({ field, fieldState }) => (
-                                <Select
-                                    {...field}
-                                    fullWidth
-                                    error={!!fieldState.error}
-                                    size="small"
-                                    margin="normal"
-                                >
-                                    {categories?.map((category, index) => (
-                                        <MenuItem key={index} value={category?._id}>
-                                            {category?.name}
-                                        </MenuItem>
-                                    ))}
-                                </Select>
+                                <>
+                                    <Select
+                                        {...field}
+                                        fullWidth
+                                        error={!!fieldState.error}
+                                        size="small"
+                                        margin="normal"
+                                    >
+                                        {categories?.map((category, index) => (
+                                            <MenuItem key={index} value={category?._id}>
+                                                {category?.name}
+                                            </MenuItem>
+                                        ))}
+                                    </Select>
+                                    <p>{fieldState.error?.message}</p>
+                                </>
                             )}
                         />
+
                     </Box>
                     <Box mb={2}>
                         <InputLabel>Title</InputLabel>
@@ -396,15 +451,19 @@ const Product = () => {
                             name="name"
                             control={control}
                             defaultValue=""
-                            render={({ field }) => (
-                                <TextField
-                                    {...field}
-                                    type="text"
-                                    fullWidth
-                                    margin="normal"
-                                    required
-                                    size="small"
-                                />
+                            render={({ field, fieldState }) => (
+                                <>
+
+                                    <TextField
+                                        {...field}
+                                        type="text"
+                                        fullWidth
+                                        margin="normal"
+                                        required
+                                        size="small"
+                                    />
+                                    <p>{fieldState.error?.message}</p>
+                                </>
                             )}
                         />
                     </Box>
@@ -413,20 +472,26 @@ const Product = () => {
                         <Controller
                             name="photos"
                             control={control}
-                            render={() => (
-                                <TextField
-                                    type="file"
-                                    variant="outlined"
-                                    onChange={handleImageChange}
-                                    margin="normal"
+                            render={({ fieldState }) => (
+                                <>
 
-                                    inputProps={{
-                                        accept: "image/*", // Limit file selection to images
-                                        multiple: true
-                                    }}
-                                    fullWidth
-                                    size="small"
-                                />
+
+
+                                  <TextField
+                                        type="file"
+                                        variant="outlined"
+                                        onChange={handleImageChange}
+                                        margin="normal"
+
+                                        inputProps={{
+                                            accept: "image/*", // Limit file selection to images
+                                            multiple: true
+                                        }}
+                                        fullWidth
+                                        size="small"
+                                    />
+                                    <p>{fieldState.error?.message}</p>
+                                </>
                             )}
                         />
                     </Box>
@@ -475,7 +540,7 @@ const Product = () => {
                                 key={index}
                                 name={`features[${index}].value`}
                                 control={control}
-                                render={({ field }) => (
+                                render={({ field , fieldState}) => (
                                     <>
                                         <InputLabel>{features[index].key}</InputLabel>
                                         <TextField
@@ -485,6 +550,7 @@ const Product = () => {
                                             value={feature.value}
                                             onChange={(e) => updateFeature(index, e.target.value)}
                                         />
+                                            <p>{fieldState.error?.message}</p>
                                     </>
                                 )}
                             />
