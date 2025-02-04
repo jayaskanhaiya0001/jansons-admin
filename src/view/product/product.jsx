@@ -26,7 +26,7 @@ import { toast } from 'react-toastify';
 import * as yup from "yup";
 import { yupResolver } from "@hookform/resolvers/yup";
 import 'react-toastify/dist/ReactToastify.css';
-// import { InputAsterisk } from "../../component/label/InputLabels";
+
 const CustomButton = styled(Button)(({ theme }) => ({
     padding: '8px 16px !important',
     height: "max-content"
@@ -147,7 +147,7 @@ const Product = () => {
     const [categories, setCategories] = useState([])
     const [productData, setProductData] = useState([]);
     const [loading, setLoading] = useState(false);
-    const { handleSubmit, control, reset, setValue, watch, formState: { errors }  } = useForm({
+    const { handleSubmit, control, reset, setValue, watch, formState: { errors } } = useForm({
         defaultValues: {
             newCategory: "",
             name: "",
@@ -165,11 +165,19 @@ const Product = () => {
                 key: "Size",
                 value: ''
             },
+            {
+                key: "Name",
+                value: ''
+            },
+            {
+                key: "Part No.",
+                value: ''
+            }
             ]
         },
         resolver: yupResolver(validationSchema)
     });
-    console.log(errors , 'errors')
+    console.log(errors, 'errors')
     const images = watch("photos");
     const newCategory = watch("newCategory");
     // Function to handle image selection
@@ -179,20 +187,7 @@ const Product = () => {
         const selectedFiles = Array.from(e.target.files);
         setValue("photos", selectedFiles);
 
-        // Generate URLs and store them
-        // const convertToBase64 = (file) => {
-        //     return new Promise((resolve, reject) => {
-        //         const reader = new FileReader();
-        //         reader.readAsDataURL(file);
-        //         reader.onload = () => resolve(reader.result);
-        //         reader.onerror = (error) => reject(error);
-        //     });
-        // };
-        // Promise.all(selectedFiles.map(file => convertToBase64(file)))
-        //     .then(base64Images => {
-        //         setValue("photos", [...images, ...base64Images]);
-        //     })
-        //     .catch(error => console.error('Error converting images:', error));
+
     };
 
 
@@ -301,7 +296,7 @@ const Product = () => {
             });
 
             if (response.data) {
-                
+
                 getAllCategory()
                 toast.success('Category added successfully!', {
                     position: 'top-center',
@@ -375,7 +370,7 @@ const Product = () => {
     useEffect(() => {
         getAllCategory()
     }, [])
-    console.log(watch() , 'Watch list')
+
     return (
         <div style={{ height: "100%" }}>
             <Box display={'flex'} flex={1} justifyContent={'space-between'} mb={4} pt={4} px={4}>
@@ -477,7 +472,7 @@ const Product = () => {
 
 
 
-                                  <TextField
+                                    <TextField
                                         type="file"
                                         variant="outlined"
                                         onChange={handleImageChange}
@@ -540,7 +535,7 @@ const Product = () => {
                                 key={index}
                                 name={`features[${index}].value`}
                                 control={control}
-                                render={({ field , fieldState}) => (
+                                render={({ field, fieldState }) => (
                                     <>
                                         <InputLabel>{features[index].key}</InputLabel>
                                         <TextField
@@ -550,7 +545,7 @@ const Product = () => {
                                             value={feature.value}
                                             onChange={(e) => updateFeature(index, e.target.value)}
                                         />
-                                            <p>{fieldState.error?.message}</p>
+                                        <p>{fieldState.error?.message}</p>
                                     </>
                                 )}
                             />
