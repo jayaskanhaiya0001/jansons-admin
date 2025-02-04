@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { Grid, Paper, Typography, Box, TableContainer, Table, TableHead, TableRow, TableCell, TableBody } from '@mui/material';
 import * as XLSX from "xlsx";
 import { GetApp as GetAppIcon } from "@mui/icons-material";
@@ -15,6 +15,9 @@ const Enquiry = () => {
 
     const [contactUsData, setcontactUsData] = useState([]);
     const [loading, setLoading] = useState(false);
+
+    const tableRef = useRef(null);
+    
     const transformData = (data) => {
         return data
             .map(item => `${item.key}: ${item.value}`) // Create key-value pairs
@@ -117,21 +120,43 @@ const Enquiry = () => {
     }
 
     const exportToExcel = () => {
-        // Convert array of objects to worksheet
-        const worksheet = XLSX.utils.json_to_sheet([]);
+        // Get the table element using the ref
+        const table = tableRef.current;
 
-        // Create a new workbook and append the worksheet
+        // Extract headers from the table
+        const headers = Array.from(table.querySelectorAll("thead th")).map(
+            (th) => th.innerText
+        );
+
+        // Extract rows from the table
+        const rows = Array.from(table.querySelectorAll("tbody tr")).map((tr) =>
+            Array.from(tr.querySelectorAll("td")).map((td) => td.innerText)
+        );
+
+        // Combine headers and rows into an array of objects
+        const data = rows.map((row) => {
+            return headers.reduce((obj, header, index) => {
+                obj[header] = row[index];
+                return obj;
+            }, {});
+        });
+
+        console.log('data: ', data);
+
+        // Convert data to a worksheet
+        const worksheet = XLSX.utils.json_to_sheet(data);
+
+        // Create a workbook and add the worksheet
         const workbook = XLSX.utils.book_new();
         XLSX.utils.book_append_sheet(workbook, worksheet, "Sheet1");
 
-        // Write the workbook and trigger download
+        // Write the workbook to a file and trigger download
         const excelBuffer = XLSX.write(workbook, {
             bookType: "xlsx",
             type: "array",
         });
-
         const blob = new Blob([excelBuffer], { type: "application/octet-stream" });
-        saveAs(blob, "data.xlsx");
+        saveAs(blob, "table_data.xlsx");
     };
 
     console.log(contactUsData, 'contactUsData')
@@ -157,7 +182,7 @@ const Enquiry = () => {
                     alignItems="center"
                     height="70vh"
                 > <CircularProgress size={48} /> </Box> : <TableContainer component={Paper} >
-                    <Table>
+                    <Table ref={tableRef}>
                         <TableHead>
                             <TableRow>
                                 {Object.keys(contactUsData[0] || {})?.map((key, index) => {
