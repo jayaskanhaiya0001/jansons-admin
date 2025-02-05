@@ -18,13 +18,15 @@ import {
     CircularProgress
 } from "@mui/material";
 
-import { Delete, Edit } from '@mui/icons-material';
+import { Delete, Edit, GetApp as GetAppIcon } from '@mui/icons-material';
 import { useForm, Controller } from "react-hook-form";
 import DeleteIcon from '@mui/icons-material/Delete';
+import { saveAs } from "file-saver";
 import axios from "axios";
 import { toast } from 'react-toastify';
 import * as yup from "yup";
 import { yupResolver } from "@hookform/resolvers/yup";
+import * as XLSX from "xlsx";
 import 'react-toastify/dist/ReactToastify.css';
 
 const CustomButton = styled(Button)(({ theme }) => ({
@@ -190,13 +192,11 @@ const Product = () => {
 
     };
 
-
     // Function to remove an image from the list
     const removeImage = (index) => {
         const updatedImages = images.filter((_, i) => i !== index);
         setValue("photos", updatedImages);
     };
-
 
     const getAllProduct = async () => {
         setLoading(true)
@@ -265,9 +265,6 @@ const Product = () => {
             .catch(error => console.error('Error:', error));
 
     };
-
-
-
 
     const getAllCategory = async () => {
         try {
@@ -365,6 +362,54 @@ const Product = () => {
     const handleEdit = (index) => {
         const product = productData[index];
         Object.keys(product).forEach(key => setValue(key, product[key]));
+    };
+
+    const exportToExcel = () => {
+
+        const headers = ["name", "title", "material", "category", "brand", "size", "partNo", "moving", "createdAt", "updatedAt"]; // Constant headers
+
+        function findFeature(header, features){
+            const feat = features.find((ftr)=> header.toLowerCase() == ftr['key'].toLowerCase() )
+            return feat?.value;
+        }
+
+        function findCategory(cat){
+            const des_cat = categories.find((c)=>c._id == cat);
+            return des_cat?.name;
+        }
+
+        console.log('product: ', productData);
+
+        // Combine headers and rows into an array of objects
+        const data = productData.map((product) => {
+            return headers.reduce((obj, header, index) => {
+                if(header == 'name' || header == 'createdAt' || header == 'updatedAt'){
+                    obj[header] = product[header] || '';
+                }
+                else if (header == 'category'){
+                    obj['category'] = findCategory(product['category']);
+                }else{
+                    obj[header] = findFeature(header, product['features']);
+                }
+                return obj;
+            }, {});
+        });
+
+        // Convert data to a worksheet
+        const worksheet = XLSX.utils.json_to_sheet(data);
+
+        // Create a workbook and add the worksheet
+        const workbook = XLSX.utils.book_new();
+        XLSX.utils.book_append_sheet(workbook, worksheet, "Sheet1");
+
+        // Write the workbook to a file and trigger download
+        const excelBuffer = XLSX.write(workbook, {
+            bookType: "xlsx",
+            type: "array",
+        });
+        const blob = new Blob([excelBuffer], { type: "application/octet-stream" });
+        saveAs(blob, "table_data.xlsx");
+
     };
 
     useEffect(() => {
@@ -563,35 +608,42 @@ const Product = () => {
                     alignItems="center"
                     height="70vh"
                 > <CircularProgress size={48} /> </Box> :
-                    <Grid container spacing={3} px={4}>
-                        {productData.map((product, index) => (
-                            <Grid item xs={12} sm={6} md={4} key={index} >
-                                <Card>
-                                    {console.log(product, 'product')}
-                                    <CardContent>
-                                        <Typography variant="h6">{product?.name}</Typography>
-                                        <Typography variant="body2">{product?.description}</Typography>
-                                        {
-                                            product?.features?.map((data) => <Typography variant="body2">{data?.key}: {data?.value}</Typography>)
-                                        }
-                                        <Box sx={{ mt: 2 }}>
-                                            {product?.image && <img src={product?.image} alt="product" style={{ maxWidth: '100%' }} />}
-                                        </Box>
+                    <>
+                        <div className="">
+                            <IconButton color="primary" onClick={exportToExcel}>
+                                <GetAppIcon />
+                            </IconButton>
+                        </div>
+                        <Grid container spacing={3} px={4}>
+                            {productData.map((product, index) => (
+                                <Grid item xs={12} sm={6} md={4} key={index} >
+                                    <Card>
+                                        {console.log(product, 'product')}
+                                        <CardContent>
+                                            <Typography variant="h6">{product?.name}</Typography>
+                                            <Typography variant="body2">{product?.description}</Typography>
+                                            {
+                                                product?.features?.map((data) => <Typography variant="body2">{data?.key}: {data?.value}</Typography>)
+                                            }
+                                            <Box sx={{ mt: 2 }}>
+                                                {product?.image && <img src={product?.image} alt="product" style={{ maxWidth: '100%' }} />}
+                                            </Box>
 
-                                        {/* Edit and Delete buttons */}
-                                        <Box sx={{ display: 'flex', justifyContent: 'space-between', mt: 2 }}>
-                                            <IconButton onClick={() => { handleEdit(index); setDrawerOpen(true) }} color="primary">
-                                                <Edit />
-                                            </IconButton>
-                                            <IconButton onClick={() => handleDelete(product?._id)} color="secondary">
-                                                <Delete />
-                                            </IconButton>
-                                        </Box>
-                                    </CardContent>
-                                </Card>
-                            </Grid>
-                        ))}
-                    </Grid>
+                                            {/* Edit and Delete buttons */}
+                                            <Box sx={{ display: 'flex', justifyContent: 'space-between', mt: 2 }}>
+                                                <IconButton onClick={() => { handleEdit(index); setDrawerOpen(true) }} color="primary">
+                                                    <Edit />
+                                                </IconButton>
+                                                <IconButton onClick={() => handleDelete(product?._id)} color="secondary">
+                                                    <Delete />
+                                                </IconButton>
+                                            </Box>
+                                        </CardContent>
+                                    </Card>
+                                </Grid>
+                            ))}
+                        </Grid>
+                    </>
             }
 
         </div>
