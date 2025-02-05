@@ -169,16 +169,13 @@ const Product = () => {
                 key: "Size",
                 value: ''
             },
-            {
-                key: "Movement",
-                value: ''
-            },
+
             {
                 key: "Part No.",
                 value: ''
             },
             {
-                key: "Stock",
+                key: "Stock Movement",
                 value: ''
             }
             ]
