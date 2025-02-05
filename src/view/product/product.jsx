@@ -545,44 +545,6 @@ const Product = () => {
                             )}
                         />
                     </Box>
-                    {/* <Box mt={2}>
-                        {images && images?.length > 0 && images?.map((img, index) => (
-                            <Box key={index} display="flex" alignItems="center" gap={2} mb={1}>
-                                {console.log(img, 'IMG')}
-                                <img src={img} height={'100px'} width={'100px'} />
-                                <IconButton color="error" onClick={() => removeImage(index)}>
-                                    <DeleteIcon />
-                                </IconButton>
-                            </Box>
-                        ))}
-                    </Box> */}
-                    {/* <Box mb={2}>
-                        <InputLabel>Description</InputLabel>
-                        <Controller
-                            name="description"
-                            control={control}
-                            defaultValue=""
-                            render={({ field }) => (
-                                <TextField
-                                    {...field}
-
-                                    type="text"
-                                    fullWidth
-                                    margin="normal"
-                                    required
-                                    rows={4} // 
-                                    multiline
-                                    sx={{
-                                        '& .MuiOutlinedInput-root': {
-                                            maxHeight: 'max-content !important',
-                                            height: "auto !important"
-                                        },
-
-                                    }}
-                                />
-                            )}
-                        />
-                    </Box> */}
                     <Box>
 
                         {features.map((feature, index) => (
@@ -593,7 +555,7 @@ const Product = () => {
                                 render={({ field, fieldState }) => (
                                     <>
                                         {
-                                            features[index].key === 'Stock' ? (
+                                            features[index].key === 'Stock Movement' ? (
                                                 <>
                                                     <InputLabel>{features[index].key}</InputLabel>
                                                     <Box>
