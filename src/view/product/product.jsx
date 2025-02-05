@@ -15,7 +15,9 @@ import {
     styled,
     IconButton,
     InputLabel,
-    CircularProgress
+    CircularProgress,
+    FormControlLabel,
+    Checkbox
 } from "@mui/material";
 
 import { Delete, Edit, GetApp as GetAppIcon } from '@mui/icons-material';
@@ -168,18 +170,21 @@ const Product = () => {
                 value: ''
             },
             {
-                key: "Name",
+                key: "Movement",
                 value: ''
             },
             {
                 key: "Part No.",
+                value: ''
+            },
+            {
+                key: "Stock",
                 value: ''
             }
             ]
         },
         resolver: yupResolver(validationSchema)
     });
-    console.log(errors, 'errors')
     const images = watch("photos");
     const newCategory = watch("newCategory");
     // Function to handle image selection
@@ -368,13 +373,13 @@ const Product = () => {
 
         const headers = ["name", "title", "material", "category", "brand", "size", "partNo", "moving", "createdAt", "updatedAt"]; // Constant headers
 
-        function findFeature(header, features){
-            const feat = features.find((ftr)=> header.toLowerCase() == ftr['key'].toLowerCase() )
+        function findFeature(header, features) {
+            const feat = features.find((ftr) => header.toLowerCase() == ftr['key'].toLowerCase())
             return feat?.value;
         }
 
-        function findCategory(cat){
-            const des_cat = categories.find((c)=>c._id == cat);
+        function findCategory(cat) {
+            const des_cat = categories.find((c) => c._id == cat);
             return des_cat?.name;
         }
 
@@ -383,12 +388,12 @@ const Product = () => {
         // Combine headers and rows into an array of objects
         const data = productData.map((product) => {
             return headers.reduce((obj, header, index) => {
-                if(header == 'name' || header == 'createdAt' || header == 'updatedAt'){
+                if (header == 'name' || header == 'createdAt' || header == 'updatedAt') {
                     obj[header] = product[header] || '';
                 }
-                else if (header == 'category'){
+                else if (header == 'category') {
                     obj['category'] = findCategory(product['category']);
-                }else{
+                } else {
                     obj[header] = findFeature(header, product['features']);
                 }
                 return obj;
@@ -416,15 +421,24 @@ const Product = () => {
         getAllCategory()
     }, [])
 
+
     return (
         <div style={{ height: "100%" }}>
             <Box display={'flex'} flex={1} justifyContent={'space-between'} mb={4} pt={4} px={4}>
                 <Typography component={'h1'} fontSize={'26px'}>
                     Product List
                 </Typography>
-                <Button variant="contained" onClick={() => setDrawerOpen(true)}>
-                    Add Product
-                </Button>
+                <Box display={'flex'} gap={2} alignItems={'center'}>
+
+                    <div className="">
+                        <IconButton color="primary" onClick={exportToExcel}>
+                            <GetAppIcon />
+                        </IconButton>
+                    </div>
+                    <Button variant="contained" onClick={() => setDrawerOpen(true)}>
+                        Add Product
+                    </Button>
+                </Box>
             </Box>
             <Drawer anchor="right" open={drawerOpen} onClose={() => setDrawerOpen(false)} sx={{
 
@@ -437,7 +451,6 @@ const Product = () => {
                             render={({ field }) => (
                                 <Box flex={1}>
                                     <InputLabel>Add new category</InputLabel>
-                                    {/* <InputAsterisk label="Add new category" htmlFor="" /> */}
                                     <TextField
                                         {...field}
                                         fullWidth
@@ -582,15 +595,31 @@ const Product = () => {
                                 control={control}
                                 render={({ field, fieldState }) => (
                                     <>
-                                        <InputLabel>{features[index].key}</InputLabel>
-                                        <TextField
-                                            {...field}
-                                            fullWidth
-                                            margin="normal"
-                                            value={feature.value}
-                                            onChange={(e) => updateFeature(index, e.target.value)}
-                                        />
-                                        <p>{fieldState.error?.message}</p>
+                                        {
+                                            features[index].key === 'Stock' ? (
+                                                <>
+                                                    <InputLabel>{features[index].key}</InputLabel>
+                                                    <Box>
+                                                        <FormControlLabel control={<Checkbox value={'true'} onChange={() => updateFeature(index, 'true')} checked={features[index].value === 'true'} />} label="Fast Moving Stock (A)" />
+                                                        <FormControlLabel control={<Checkbox value={'false'} onChange={() => updateFeature(index, 'false')} checked={features[index].value === 'false'} />} label="Slow Moving Stock (A)" />
+                                                    </Box>
+                                                    <p>{fieldState.error?.message}</p>
+                                                </>
+                                            ) : (
+                                                <>
+                                                    <InputLabel>{features[index].key}</InputLabel>
+                                                    <TextField
+                                                        {...field}
+                                                        fullWidth
+                                                        margin="normal"
+                                                        value={feature.value}
+                                                        onChange={(e) => updateFeature(index, e.target.value)}
+                                                    />
+                                                    <p>{fieldState.error?.message}</p>
+                                                </>
+                                            )
+                                        }
+
                                     </>
                                 )}
                             />
@@ -609,11 +638,7 @@ const Product = () => {
                     height="70vh"
                 > <CircularProgress size={48} /> </Box> :
                     <>
-                        <div className="">
-                            <IconButton color="primary" onClick={exportToExcel}>
-                                <GetAppIcon />
-                            </IconButton>
-                        </div>
+
                         <Grid container spacing={3} px={4}>
                             {productData.map((product, index) => (
                                 <Grid item xs={12} sm={6} md={4} key={index} >

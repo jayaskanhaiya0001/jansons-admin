@@ -6,6 +6,7 @@ import {
   Typography,
   CircularProgress,
   InputLabel,
+  Image
 } from "@mui/material";
 import { useState } from 'react';
 import { yupResolver } from "@hookform/resolvers/yup";
@@ -117,7 +118,11 @@ const Login = () => {
               background: "#DD781E",
               boxShadow: "0px 4px 4px 0px rgba(0, 0, 0, 0.25)",
             }}
+
           >
+            <Box sx={{ width: "100%", display: "flex", justifyContent: "center", flex: 1, background: "#fff" , py: 2, mb: 1 }}>
+              <img src="/logo-copy.png" className="logo" />
+            </Box>
             <Typography
               variant="h5"
               gutterBottom
