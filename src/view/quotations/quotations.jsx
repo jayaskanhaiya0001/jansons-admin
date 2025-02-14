@@ -29,7 +29,7 @@ const Quotation = () => {
             const catF = categoryData?.find((cat) =>
                 cat?._id == catId
             )
-            return catF.name;
+            return catF?.name;
         }
         return null;
     }
@@ -142,9 +142,9 @@ const Quotation = () => {
             <Box display={'flex'} width={'100%'} justifyContent={'space-between'}>
                 <Typography variant='h4' mb={3}>Quotation</Typography>
 
-                <div className="">
-                    <input type="date" name="startDate" id="startDate" onChange={onStartDateChange}/>
-                    <input type="date" name="endDate" id="endDate" onChange={onEndDateChange}/>
+                <div className="date-container">
+                    <input type="date" name="startDate" id="startDate" onChange={onStartDateChange} className='date-input'/>
+                    <input type="date" name="endDate" id="endDate" onChange={onEndDateChange} className='date-input'/>
                 </div>
 
                 <IconButton color="primary" onClick={exportToExcel}>

@@ -57,8 +57,6 @@ const Enquiry = () => {
                     setLoading(false);
                 }
             };
-
-            // const tempData1 = await getData('https://jainsons-pvt.vercel.app/api/product/getAll');
             const tempData4 = await getData('https://jainsons-pvt.vercel.app/api/categories/showAll');
             // setProductData(tempData1);
             setcategoryData(tempData4);
@@ -141,7 +139,6 @@ const Enquiry = () => {
             }, {});
         });
 
-        console.log('data: ', data);
 
         // Convert data to a worksheet
         const worksheet = XLSX.utils.json_to_sheet(data);
@@ -158,17 +155,15 @@ const Enquiry = () => {
         const blob = new Blob([excelBuffer], { type: "application/octet-stream" });
         saveAs(blob, "table_data.xlsx");
     };
-
-    console.log(contactUsData, 'contactUsData')
     return (
         // <span>sfs</span>
         <Box px={4} sx={{ mt: 4, mb: 2 }}>
             <Box display={'flex'} width={'100%'} justifyContent={'space-between'}>
                 <Typography variant='h4' mb={3}>Enquiry</Typography>
 
-                <div className="">
-                    <input type="date" name="startDate" id="startDate" onChange={onStartDateChange}/>
-                    <input type="date" name="endDate" id="endDate" onChange={onEndDateChange}/>
+                <div className="date-container">
+                    <input type="date" name="startDate" id="startDate" onChange={onStartDateChange} className='date-input'/>
+                    <input type="date" name="endDate" id="endDate" onChange={onEndDateChange} className='date-input'/>
                 </div>
 
                 <IconButton color="primary" onClick={exportToExcel}>
