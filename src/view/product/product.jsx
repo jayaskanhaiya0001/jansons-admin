@@ -423,41 +423,7 @@ const Product = () => {
     }, [])
 
 
-    const handleDeleteCategory = async (id) => {
-        try {
-            const response = await axios.delete("https://jainsons-pvt.vercel.app/api/categories/delete",
-                {
-                    data: {
-                        id: id
-                    },
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'Authorization': `Bearer ${token}`
-                    }
-                }
-
-
-            );
-            if (response.status === 200) {
-                toast.success('Category deleted successfully!', {
-                    position: 'top-center',
-                    autoClose: 3000, // Closes after 3 seconds
-                    hideProgressBar: false,
-                    closeOnClick: true,
-                    pauseOnHover: true,
-                    draggable: true,
-                });
-                getAllCategory()
-            } else {
-                //   setErrorMsg("Invalid credentials. Please try again.");
-            }
-        } catch (error) {
-            // setErrorMsg("Error logging in. Please check your credentials.");
-        } finally {
-            // setLoading(false);
-        }
-
-    };
+  
     return (
         <div style={{ height: "100%" }}>
             <Box display={'flex'} flex={1} justifyContent={'space-between'} mb={4} pt={4} px={4}>
@@ -523,14 +489,12 @@ const Product = () => {
                                         margin="normal"
                                     >
                                         {categories?.map((category, index) => (
-                                            <Box display={'flex'} justifyContent={'space-between'}>
+                                            
                                                 <MenuItem key={index} value={category?._id}>
                                                     {category?.name}
                                                 </MenuItem>
-                                                <IconButton onClick={() => handleDeleteCategory(category?._id)} color="secondary">
-                                                    <Delete />
-                                                </IconButton>
-                                            </Box>
+                                             
+                                            
                                         ))}
                                     </Select>
                                     <p>{fieldState.error?.message}</p>

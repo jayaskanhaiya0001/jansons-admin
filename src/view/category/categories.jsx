@@ -5,11 +5,13 @@ import { GetApp as GetAppIcon, } from "@mui/icons-material";
 import { IconButton, CircularProgress } from "@mui/material";
 import { saveAs } from "file-saver";
 import axios from 'axios';
+import { toast } from 'react-toastify';
+import { Delete } from '@mui/icons-material';
 const forgetThese = ['_id', 'img', 'imageURLs', '__v']
 const Category = () => {
     const [categoryData, setcategoryData] = useState();
     const [loading, setLoading] = useState(false);
-
+    const token = localStorage.getItem('token')
     const tableRef = useRef(null);
 
     const [search, setSearch] = useState('');
@@ -69,31 +71,67 @@ const Category = () => {
         saveAs(blob, "table_data.xlsx");
     };
 
-    useEffect(() => {
-        const getData = async (url) => {
-            setLoading(true);
-            const getToken = localStorage.getItem('token');
-            try {
-                const response = await axios.get('https://jainsons-pvt.vercel.app/api/categories/showAll', {
-                    headers: {
-                        Authorization: `Bearer ${getToken}`, // Add the token to the Authorization header
-                    },
-                });
+    const getData = async (url) => {
+        setLoading(true);
+        const getToken = localStorage.getItem('token');
+        try {
+            const response = await axios.get('https://jainsons-pvt.vercel.app/api/categories/showAll', {
+                headers: {
+                    Authorization: `Bearer ${getToken}`, // Add the token to the Authorization header
+                },
+            });
 
-                if (response?.data?.data) {
+            if (response?.data?.data) {
 
-                    setcategoryData(response?.data?.data)
-                }
-                // return response.data.data;
-            } catch (error) {
-                console.error('Error fetching data from:', url, error);
-                return null; // Return null or handle the error properly
-            } finally {
-                setLoading(false);
+                setcategoryData(response?.data?.data)
             }
-        };
+            // return response.data.data;
+        } catch (error) {
+            console.error('Error fetching data from:', url, error);
+            return null; // Return null or handle the error properly
+        } finally {
+            setLoading(false);
+        }
+    };
+    useEffect(() => {
         getData()
     }, []);
+
+    const handleDeleteCategory = async (id) => {
+        try {
+            const response = await axios.delete("https://jainsons-pvt.vercel.app/api/categories/delete",
+                {
+                    data: {
+                        id: id
+                    },
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${token}`
+                    }
+                }
+
+
+            );
+            if (response.status === 200) {
+                toast.success('Category deleted successfully!', {
+                    position: 'top-center',
+                    autoClose: 3000, // Closes after 3 seconds
+                    hideProgressBar: false,
+                    closeOnClick: true,
+                    pauseOnHover: true,
+                    draggable: true,
+                });
+                getData()
+            } else {
+                //   setErrorMsg("Invalid credentials. Please try again.");
+            }
+        } catch (error) {
+            // setErrorMsg("Error logging in. Please check your credentials.");
+        } finally {
+            // setLoading(false);
+        }
+
+    };
     return (
         // <span>sfs</span>
         <Box px={4} sx={{ mt: 4, mb: 2 }}>
@@ -111,43 +149,53 @@ const Category = () => {
                     height="70vh"
                 > <CircularProgress size={48} /> </Box> :
 
-                <>
-                    <input type="text" name="search-box" id="search-box" onChange={(ev)=>setSearch(ev.target.value)} />
-                    <TableContainer component={Paper} >
-                        <Table ref={tableRef}>
-                            <TableHead>
-                                <TableRow>
-                                    {categoryData && Object.keys(categoryData[0] || {})?.map((key, index) => {
-                                        return !forgetThese?.includes(key) ?
-                                            <TableCell key={index}>
+                    <>
+                        <input type="text" name="search-box" id="search-box" onChange={(ev) => setSearch(ev.target.value)} />
+                        <TableContainer component={Paper} >
+                            <Table ref={tableRef}>
+                                <TableHead>
+                                    <TableRow>
+                                        {categoryData && Object.keys(categoryData[0] || {})?.map((key, index) => {
+                                            return !forgetThese?.includes(key) ?
+                                                <TableCell key={index}>
 
-                                                {key == 'createdAt' ? 'CREATED AT' : key == 'updatedAt' ? 'UPDATED AT' : key.toUpperCase()}
-                                            </TableCell>
-                                            : null
-                                    })}
-                                </TableRow>
-                            </TableHead>
-                            <TableBody>
-                                {categoryData?.filter((item)=>item.name.toLowerCase().includes(search.toLowerCase())).map((item, index) => (
-                                    
-                                    <TableRow key={index}>
-                                        {Object.entries(item || {})?.map(([key, value], idx) =>
-                                            // Only render cells if the key is not in the 'forgetThese' array
-                                            !forgetThese.includes(key) ? (
-                                                <TableCell key={idx}>
-                                                    {typeof value === 'object' ? transformData(value)
-                                                        :
-                                                        key !== 'category' ? value ? value : "N/A" : getCategory(value)}
+                                                    {key == 'createdAt' ? 'CREATED AT' : key == 'updatedAt' ? 'UPDATED AT' : key.toUpperCase()}
                                                 </TableCell>
-                                            ) : null
-                                        )}
+                                                : null
+                                        })}
                                     </TableRow>
+                                </TableHead>
+                                <TableBody>
+                                    {categoryData?.filter((item) => item.name.toLowerCase().includes(search.toLowerCase())).map((item, index) => (
+                                        <>
 
-                                ))}
-                            </TableBody>
-                        </Table>
-                    </TableContainer>
-                </>
+                                            <TableRow key={index}>
+                                                {Object.entries(item || {})?.map(([key, value], idx) =>
+                                                    // Only render cells if the key is not in the 'forgetThese' array
+                                                    !forgetThese.includes(key) ? (
+                                                        <TableCell key={idx}>
+                                                            {typeof value === 'object' ? transformData(value)
+                                                                :
+                                                                key !== 'category' ? value ? value : "N/A" : getCategory(value)}
+                                                        </TableCell>
+                                                    ) : null
+                                                )}
+
+                                            </TableRow>
+                                            <TableCell>
+                                                <IconButton onClick={() => handleDeleteCategory(item?._id)} color="secondary">
+                                                    <Delete />
+                                                </IconButton>
+                                            </TableCell>
+                                        </>
+
+                                    ))}
+
+
+                                </TableBody>
+                            </Table>
+                        </TableContainer>
+                    </>
             }
         </Box>
     );
