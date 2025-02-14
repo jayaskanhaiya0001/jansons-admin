@@ -163,6 +163,7 @@ const Category = () => {
                                                 </TableCell>
                                                 : null
                                         })}
+                                         <TableCell>Action</TableCell>
                                     </TableRow>
                                 </TableHead>
                                 <TableBody>
@@ -181,12 +182,12 @@ const Category = () => {
                                                     ) : null
                                                 )}
 
-                                            </TableRow>
                                             <TableCell>
                                                 <IconButton onClick={() => handleDeleteCategory(item?._id)} color="secondary">
                                                     <Delete />
                                                 </IconButton>
                                             </TableCell>
+                                            </TableRow>
                                         </>
 
                                     ))}
