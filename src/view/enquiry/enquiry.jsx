@@ -57,7 +57,7 @@ const Enquiry = () => {
                     setLoading(false);
                 }
             };
-            const tempData4 = await getData('https://jainsons-pvt.vercel.app/api/categories/showAll');
+            const tempData4 = await getData('http://jainson-backend.ap-south-1.elasticbeanstalk.com/api/categories/showAll');
             // setProductData(tempData1);
             setcategoryData(tempData4);
         };
@@ -74,7 +74,7 @@ const Enquiry = () => {
             const paramsFilter = startDate && endDate ? `?startDate=${startDate}&endDate=${endDate}`: '';
 
             try {
-                const response = await axios.get(`https://jainsons-pvt.vercel.app/api/contactUs/showAll${paramsFilter}`, {
+                const response = await axios.get(`http://jainson-backend.ap-south-1.elasticbeanstalk.com/api/contactUs/showAll${paramsFilter}`, {
                     headers: {
                         Authorization: `Bearer ${getToken}`, // Add the token to the Authorization header
                     },

@@ -151,37 +151,41 @@ const Product = () => {
     const [categories, setCategories] = useState([])
     const [productData, setProductData] = useState([]);
     const [loading, setLoading] = useState(false);
+    const [isUpdate, setIsUpdate] = useState(false);
+    const [productId, setProductId] = useState(null)
     const { handleSubmit, control, reset, setValue, watch, formState: { errors } } = useForm({
         defaultValues: {
             newCategory: "",
             name: "",
             category: "",
             photos: [],
-            features: [{
-                key: "Material",
-                value: ''
-            },
-            {
-                key: "Brand",
-                value: ''
-            },
-            {
-                key: "Size",
-                value: ''
-            },
+            features: [
 
-            {
-                key: "Part No.",
-                value: ''
-            },
-            {
-                key: "Stock Movement",
-                value: ''
-            },
-            {
-                key: "Description",
-                value: ''
-            }
+                {
+                    key: "Description",
+                    value: ''
+                }, {
+                    key: "Material",
+                    value: ''
+                },
+                {
+                    key: "Brand",
+                    value: ''
+                },
+                {
+                    key: "Size",
+                    value: ''
+                },
+
+                {
+                    key: "Part No.",
+                    value: ''
+                },
+                {
+                    key: "Stock Movement",
+                    value: ''
+                },
+
             ]
         },
         resolver: yupResolver(validationSchema)
@@ -207,7 +211,7 @@ const Product = () => {
     const getAllProduct = async () => {
         setLoading(true)
         try {
-            const response = await axios.get("https://jainsons-pvt.vercel.app/api/product/getAll", {
+            const response = await axios.get("http://jainson-backend.ap-south-1.elasticbeanstalk.com/api/product/getAll", {
                 headers: {
                     Authorization: `Bearer ${token}`
                 }
@@ -242,39 +246,67 @@ const Product = () => {
             });
         }
 
+        if (isUpdate) {
+            formData.append("id", productId);
+        }
+
         // Append features
         data.features.forEach((feature, index) => {
             formData.append(`features[${index}][key]`, feature.key);
             formData.append(`features[${index}][value]`, feature.value);
         });
+        if (isUpdate) {
 
-        // Example API call using axios
-        await axios.post('https://jainsons-pvt.vercel.app/api/product/add', formData, {
-            headers: {
-                Authorization: `Bearer ${token}`,
-                'Content-Type': 'multipart/form-data',
-            }
-        })
-            .then(response => {
-                toast.success('Product Add successfully!', {
-                    position: 'top-center',
-                    autoClose: 3000, // Closes after 3 seconds
-                    hideProgressBar: false,
-                    closeOnClick: true,
-                    pauseOnHover: true,
-                    draggable: true,
-                });
-                reset()
-                getAllProduct()
-                setDrawerOpen(false)
+            await axios.put(`http://jainson-backend.ap-south-1.elasticbeanstalk.com/api/product/edit`, formData, {
+                headers: {
+                    Authorization: `Bearer ${token}`,
+                    'Content-Type': 'multipart/form-data',
+                }
             })
-            .catch(error => console.error('Error:', error));
+                .then(response => {
+                    toast.success('Product Update successfully!', {
+                        position: 'top-center',
+                        autoClose: 3000, // Closes after 3 seconds
+                        hideProgressBar: false,
+                        closeOnClick: true,
+                        pauseOnHover: true,
+                        draggable: true,
+                    });
+                    reset()
+                    getAllProduct()
+                    setDrawerOpen(false)
+                })
+                .catch(error => console.error('Error:', error));
+        } else {
+
+            await axios.post(`http://jainson-backend.ap-south-1.elasticbeanstalk.com/api/product/add`, formData, {
+                headers: {
+                    Authorization: `Bearer ${token}`,
+                    'Content-Type': 'multipart/form-data',
+                }
+            })
+                .then(response => {
+                    toast.success('Product Add successfully!', {
+                        position: 'top-center',
+                        autoClose: 3000, // Closes after 3 seconds
+                        hideProgressBar: false,
+                        closeOnClick: true,
+                        pauseOnHover: true,
+                        draggable: true,
+                    });
+                    reset()
+                    getAllProduct()
+                    setDrawerOpen(false)
+                })
+                .catch(error => console.error('Error:', error));
+        }
 
     };
+    // Example API call using axios
 
     const getAllCategory = async () => {
         try {
-            const response = await axios.get("https://jainsons-pvt.vercel.app/api/categories/showAll", {
+            const response = await axios.get("http://jainson-backend.ap-south-1.elasticbeanstalk.com/api/categories/showAll", {
                 headers: {
                     Authorization: `Bearer ${token}`
                 }
@@ -292,7 +324,7 @@ const Product = () => {
     }
     const handleAddCategory = async (newCategory) => {
         try {
-            const response = await axios.post("https://jainsons-pvt.vercel.app/api/categories/add", { name: newCategory }, {
+            const response = await axios.post("http://jainson-backend.ap-south-1.elasticbeanstalk.com/api/categories/add", { name: newCategory }, {
                 headers: {
                     Authorization: `Bearer ${token}`
                 }
@@ -309,6 +341,7 @@ const Product = () => {
                     pauseOnHover: true,
                     draggable: true,
                 });
+                setValue('newCategory', '')
             } else {
                 //   setErrorMsg("Invalid credentials. Please try again.");
             }
@@ -319,6 +352,8 @@ const Product = () => {
         }
 
     };
+
+
 
     const features = watch("features");
 
@@ -331,7 +366,7 @@ const Product = () => {
 
     const handleDelete = async (id) => {
         try {
-            const response = await axios.delete("https://jainsons-pvt.vercel.app/api/product/delete",
+            const response = await axios.delete("http://jainson-backend.ap-south-1.elasticbeanstalk.com/api/product/delete",
                 {
                     data: {
                         id: id
@@ -368,6 +403,7 @@ const Product = () => {
     const handleEdit = (index) => {
         const product = productData[index];
         Object.keys(product).forEach(key => setValue(key, product[key]));
+        setIsUpdate(true)
     };
 
     const exportToExcel = () => {
@@ -423,7 +459,7 @@ const Product = () => {
     }, [])
 
 
-  
+
     return (
         <div style={{ height: "100%" }}>
             <Box display={'flex'} flex={1} justifyContent={'space-between'} mb={4} pt={4} px={4}>
@@ -442,23 +478,26 @@ const Product = () => {
                     </Button>
                 </Box>
             </Box>
-            <Drawer anchor="right" open={drawerOpen} onClose={() => setDrawerOpen(false)} sx={{
+            <Drawer anchor="right" open={drawerOpen} onClose={() => { setDrawerOpen(false); setIsUpdate(false); setProductId(null) }} sx={{
 
             }}>
                 <form onSubmit={handleSubmit(onSubmit)} style={{ padding: "40px 20px", width: "600px", marginTop: "40px", }}>
-                    <Box sx={{ display: "flex", gap: 2, marginBottom: 2, mt: 2, alignItems: "flex-end" }}>
+                    <Box sx={{ display: "flex", gap: 2, marginBottom: 2, mt: 2, alignItems: " flex-end" }}>
                         <Controller
                             name="newCategory"
                             control={control}
                             render={({ field }) => (
-                                <Box flex={1}>
+                                <Box flex={1} justifyContent={'space-between'}>
                                     <InputLabel>Add new category</InputLabel>
                                     <TextField
                                         {...field}
+                                        value={watch('newCategory') || ''}
                                         fullWidth
                                         variant="outlined"
                                         size="small"
-                                        margin="normal"
+                                        sx={{
+                                            mt: 1
+                                        }}
                                     />
                                 </Box>
                             )}
@@ -468,6 +507,7 @@ const Product = () => {
                             color="primary"
                             onClick={() => handleAddCategory(newCategory || '')}
                             sx={{ whiteSpace: "nowrap" }}
+
                         >
                             Add Category
                         </CustomButton>
@@ -489,12 +529,9 @@ const Product = () => {
                                         margin="normal"
                                     >
                                         {categories?.map((category, index) => (
-                                            
-                                                <MenuItem key={index} value={category?._id}>
-                                                    {category?.name}
-                                                </MenuItem>
-                                             
-                                            
+                                            <MenuItem key={index} value={category?._id}>
+                                                {category?.name}
+                                            </MenuItem>
                                         ))}
                                     </Select>
                                     <p>{fieldState.error?.message}</p>
@@ -574,13 +611,16 @@ const Product = () => {
                                                 </>
                                             ) : (
                                                 <>
+                                                    {console.log(features[index].key === 'Description', 'Hello')}
                                                     <InputLabel>{features[index].key}</InputLabel>
                                                     <TextField
                                                         {...field}
                                                         fullWidth
                                                         margin="normal"
                                                         value={feature.value}
+                                                        multiline
                                                         onChange={(e) => updateFeature(index, e.target.value)}
+                                                        rows={features[index].key === 'Description' ? 4 : ''}
                                                     />
                                                     <p>{fieldState.error?.message}</p>
                                                 </>
@@ -610,7 +650,7 @@ const Product = () => {
                             {productData.map((product, index) => (
                                 <Grid item xs={12} sm={6} md={4} key={index} >
                                     <Card>
-                                        {console.log(product, 'product')}
+                                        {console.log(product, 'Check Product')}
                                         <CardContent>
                                             <Typography variant="h6">{product?.name}</Typography>
                                             <Typography variant="body2">{product?.description}</Typography>
@@ -623,7 +663,7 @@ const Product = () => {
 
                                             {/* Edit and Delete buttons */}
                                             <Box sx={{ display: 'flex', justifyContent: 'space-between', mt: 2 }}>
-                                                <IconButton onClick={() => { handleEdit(index); setDrawerOpen(true) }} color="primary">
+                                                <IconButton onClick={() => { handleEdit(index); setDrawerOpen(true); setProductId(product?._id) }} color="primary">
                                                     <Edit />
                                                 </IconButton>
                                                 <IconButton onClick={() => handleDelete(product?._id)} color="secondary">

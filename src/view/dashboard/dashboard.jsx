@@ -63,11 +63,11 @@ const Dashboard = () => {
         }
       };
 
-      const tempData1 = await getData('https://jainsons-pvt.vercel.app/api/product/getAll');
-      const tempData2 = await getData('https://jainsons-pvt.vercel.app/api/quotes/getAll');
-      const tempData3 = await getData('https://jainsons-pvt.vercel.app/api/contactUs/showAll');
-      const tempData4 = await getData('https://jainsons-pvt.vercel.app/api/categories/showAll');
-      // const monthlyQuote = await getData('https://jainsons-pvt.vercel.app/api/quotes/getAll?monthlyData=true');
+      const tempData1 = await getData('http://jainson-backend.ap-south-1.elasticbeanstalk.com/api/product/getAll');
+      const tempData2 = await getData('http://jainson-backend.ap-south-1.elasticbeanstalk.com/api/quotes/getAll');
+      const tempData3 = await getData('http://jainson-backend.ap-south-1.elasticbeanstalk.com/api/contactUs/showAll');
+      const tempData4 = await getData('http://jainson-backend.ap-south-1.elasticbeanstalk.com/api/categories/showAll');
+      // const monthlyQuote = await getData('http://jainson-backend.ap-south-1.elasticbeanstalk.com/api/quotes/getAll?monthlyData=true');
       // console.log(monthlyQuote , 'monthlyQuote')
       setProductData(tempData1);
       setQuoteData(tempData2);
@@ -82,12 +82,12 @@ const Dashboard = () => {
     const getData = async (url) => {
       const getToken = localStorage.getItem('token');
       try {
-        const response = await axios.get('https://jainsons-pvt.vercel.app/api/quotes/getAll?monthlyData=true', {
+        const response = await axios.get('http://jainson-backend.ap-south-1.elasticbeanstalk.com/api/quotes/getAll?monthlyData=true', {
           headers: {
             Authorization: `Bearer ${getToken}`, // Add the token to the Authorization header
           },
         });
-        const response1 = await axios.get('https://jainsons-pvt.vercel.app/api/contactUs/showAll?monthlyData=true', {
+        const response1 = await axios.get('http://jainson-backend.ap-south-1.elasticbeanstalk.com/api/contactUs/showAll?monthlyData=true', {
           headers: {
             Authorization: `Bearer ${getToken}`, // Add the token to the Authorization header
           },

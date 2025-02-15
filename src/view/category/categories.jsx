@@ -75,7 +75,7 @@ const Category = () => {
         setLoading(true);
         const getToken = localStorage.getItem('token');
         try {
-            const response = await axios.get('https://jainsons-pvt.vercel.app/api/categories/showAll', {
+            const response = await axios.get('http://jainson-backend.ap-south-1.elasticbeanstalk.com/api/categories/showAll', {
                 headers: {
                     Authorization: `Bearer ${getToken}`, // Add the token to the Authorization header
                 },
@@ -99,7 +99,7 @@ const Category = () => {
 
     const handleDeleteCategory = async (id) => {
         try {
-            const response = await axios.delete("https://jainsons-pvt.vercel.app/api/categories/delete",
+            const response = await axios.delete("http://jainson-backend.ap-south-1.elasticbeanstalk.com/api/categories/delete",
                 {
                     data: {
                         id: id
@@ -137,6 +137,18 @@ const Category = () => {
         <Box px={4} sx={{ mt: 4, mb: 2 }}>
             <Box display={'flex'} width={'100%'} justifyContent={'space-between'}>
                 <Typography variant='h4' mb={3}>Category</Typography>
+                <input type="text" name="search-box" id="search-box" placeholder='Search Category...'  onChange={(ev) => setSearch(ev.target.value)} style={{
+                    width: "100%", // Full width
+                    maxWidth: "300px", // Limit width
+                    padding: "10px 15px", // Comfortable padding
+                    fontSize: "16px", // Readable text
+                    border: "2px solid #ccc", // Soft border
+                    borderRadius: "8px", // Rounded corners
+                    outline: "none", // Remove default outline
+                    transition: "border-color 0.3s ease-in-out",
+                    height: "max-content"
+                }}
+                />
                 <IconButton color="primary" onClick={exportToExcel}>
                     <GetAppIcon />
                 </IconButton>
@@ -150,7 +162,7 @@ const Category = () => {
                 > <CircularProgress size={48} /> </Box> :
 
                     <>
-                        <input type="text" name="search-box" id="search-box" onChange={(ev) => setSearch(ev.target.value)} />
+
                         <TableContainer component={Paper} >
                             <Table ref={tableRef}>
                                 <TableHead>
@@ -163,7 +175,7 @@ const Category = () => {
                                                 </TableCell>
                                                 : null
                                         })}
-                                         <TableCell>Action</TableCell>
+                                        <TableCell>Action</TableCell>
                                     </TableRow>
                                 </TableHead>
                                 <TableBody>
@@ -182,11 +194,11 @@ const Category = () => {
                                                     ) : null
                                                 )}
 
-                                            <TableCell>
-                                                <IconButton onClick={() => handleDeleteCategory(item?._id)} color="secondary">
-                                                    <Delete />
-                                                </IconButton>
-                                            </TableCell>
+                                                <TableCell>
+                                                    <IconButton onClick={() => handleDeleteCategory(item?._id)} color="secondary">
+                                                        <Delete />
+                                                    </IconButton>
+                                                </TableCell>
                                             </TableRow>
                                         </>
 
