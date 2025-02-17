@@ -65,7 +65,7 @@ const validationSchema = yup.object().shape({
                             // Access the "key" field for conditional validation
                             const { key } = this.parent;
                             if (key === "Size") {
-                                return /^[a-zA-Z0-9]+$/.test(value || "");
+                               return true;
                             }
                             return true; // For other keys, no validation on format
                         }
@@ -604,8 +604,8 @@ const Product = () => {
                                                 <>
                                                     <InputLabel>{features[index].key}</InputLabel>
                                                     <Box>
-                                                        <FormControlLabel control={<Checkbox value={'true'} onChange={() => updateFeature(index, 'true')} checked={features[index].value === 'true'} />} label="Fast Moving Stock (A)" />
-                                                        <FormControlLabel control={<Checkbox value={'false'} onChange={() => updateFeature(index, 'false')} checked={features[index].value === 'false'} />} label="Slow Moving Stock (A)" />
+                                                        <FormControlLabel control={<Checkbox value={'Fast Moving Stock'} onChange={() => updateFeature(index, 'Fast Moving Stock')} checked={features[index].value === 'Fast Moving Stock'} />} label="Fast Moving Stock (A)" />
+                                                        <FormControlLabel control={<Checkbox value={'Slow Moving Stock'} onChange={() => updateFeature(index, 'Slow Moving Stock')} checked={features[index].value === 'Slow Moving Stock'} />} label="Slow Moving Stock (A)" />
                                                     </Box>
                                                     <p>{fieldState.error?.message}</p>
                                                 </>
