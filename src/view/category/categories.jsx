@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useState } from 'react';
-import { Grid, Paper, Typography, Box, TableContainer, Table, TableHead, TableRow, TableCell, TableBody } from '@mui/material';
+import { Grid, Paper, Typography, Box, TableContainer, Table, TableHead, TableRow, TableCell, TableBody , TablePagination } from '@mui/material';
 import * as XLSX from "xlsx";
 import { GetApp as GetAppIcon, } from "@mui/icons-material";
 import { IconButton, CircularProgress } from "@mui/material";
@@ -15,6 +15,17 @@ const Category = () => {
     const tableRef = useRef(null);
 
     const [search, setSearch] = useState('');
+    const [page, setPage] = useState(0);
+    const [rowsPerPage, setRowsPerPage] = useState(5);
+
+    const handleChangePage = (event, newPage) => {
+        setPage(newPage);
+    };
+
+    const handleChangeRowsPerPage = (event) => {
+        setRowsPerPage(parseInt(event.target.value, 10));
+        setPage(0);
+    };
     const transformData = (data) => {
         return data
             .map(item => `${item.key}: ${item.value}`) // Create key-value pairs
@@ -137,7 +148,7 @@ const Category = () => {
         <Box px={4} sx={{ mt: 4, mb: 2 }}>
             <Box display={'flex'} width={'100%'} justifyContent={'space-between'}>
                 <Typography variant='h4' mb={3}>Category</Typography>
-                <input type="text" name="search-box" id="search-box" placeholder='Search Category...'  onChange={(ev) => setSearch(ev.target.value)} style={{
+                <input type="text" name="search-box" id="search-box" placeholder='Search Category...' onChange={(ev) => setSearch(ev.target.value)} style={{
                     width: "100%", // Full width
                     maxWidth: "300px", // Limit width
                     padding: "10px 15px", // Comfortable padding
@@ -179,7 +190,7 @@ const Category = () => {
                                     </TableRow>
                                 </TableHead>
                                 <TableBody>
-                                    {categoryData?.filter((item) => item.name.toLowerCase().includes(search.toLowerCase())).map((item, index) => (
+                                    {categoryData?.filter((item) => item.name.toLowerCase().includes(search.toLowerCase())).slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage).map((item, index) => (
                                         <>
 
                                             <TableRow key={index}>
@@ -201,12 +212,18 @@ const Category = () => {
                                                 </TableCell>
                                             </TableRow>
                                         </>
-
                                     ))}
-
-
                                 </TableBody>
                             </Table>
+                            <TablePagination
+                                rowsPerPageOptions={[5, 10, 20, 50, 100]}
+                                component="div"
+                                count={categoryData?.length}
+                                rowsPerPage={rowsPerPage}
+                                page={page}
+                                onPageChange={handleChangePage}
+                                onRowsPerPageChange={handleChangeRowsPerPage}
+                            />
                         </TableContainer>
                     </>
             }
