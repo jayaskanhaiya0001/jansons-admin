@@ -75,7 +75,7 @@ const Category = () => {
         setLoading(true);
         const getToken = localStorage.getItem('token');
         try {
-            const response = await axios.get('http://jainson-backend.ap-south-1.elasticbeanstalk.com/api/categories/showAll', {
+            const response = await axios.get('https://api.jainsonsindiaonline.com/api/categories/showAll', {
                 headers: {
                     Authorization: `Bearer ${getToken}`, // Add the token to the Authorization header
                 },
@@ -99,7 +99,7 @@ const Category = () => {
 
     const handleDeleteCategory = async (id) => {
         try {
-            const response = await axios.delete("http://jainson-backend.ap-south-1.elasticbeanstalk.com/api/categories/delete",
+            const response = await axios.delete("https://api.jainsonsindiaonline.com/api/categories/delete",
                 {
                     data: {
                         id: id

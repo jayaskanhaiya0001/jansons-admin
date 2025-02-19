@@ -211,7 +211,7 @@ const Product = () => {
     const getAllProduct = async () => {
         setLoading(true)
         try {
-            const response = await axios.get("http://jainson-backend.ap-south-1.elasticbeanstalk.com/api/product/getAll", {
+            const response = await axios.get("https://api.jainsonsindiaonline.com/api/product/getAll", {
                 headers: {
                     Authorization: `Bearer ${token}`
                 }
@@ -257,7 +257,7 @@ const Product = () => {
         });
         if (isUpdate) {
 
-            await axios.put(`http://jainson-backend.ap-south-1.elasticbeanstalk.com/api/product/edit`, formData, {
+            await axios.put(`https://api.jainsonsindiaonline.com/api/product/edit`, formData, {
                 headers: {
                     Authorization: `Bearer ${token}`,
                     'Content-Type': 'multipart/form-data',
@@ -279,7 +279,7 @@ const Product = () => {
                 .catch(error => console.error('Error:', error));
         } else {
 
-            await axios.post(`http://jainson-backend.ap-south-1.elasticbeanstalk.com/api/product/add`, formData, {
+            await axios.post(`https://api.jainsonsindiaonline.com/api/product/add`, formData, {
                 headers: {
                     Authorization: `Bearer ${token}`,
                     'Content-Type': 'multipart/form-data',
@@ -306,7 +306,7 @@ const Product = () => {
 
     const getAllCategory = async () => {
         try {
-            const response = await axios.get("http://jainson-backend.ap-south-1.elasticbeanstalk.com/api/categories/showAll", {
+            const response = await axios.get("https://api.jainsonsindiaonline.com/api/categories/showAll", {
                 headers: {
                     Authorization: `Bearer ${token}`
                 }
@@ -324,7 +324,7 @@ const Product = () => {
     }
     const handleAddCategory = async (newCategory) => {
         try {
-            const response = await axios.post("http://jainson-backend.ap-south-1.elasticbeanstalk.com/api/categories/add", { name: newCategory }, {
+            const response = await axios.post("https://api.jainsonsindiaonline.com/api/categories/add", { name: newCategory }, {
                 headers: {
                     Authorization: `Bearer ${token}`
                 }
@@ -366,7 +366,7 @@ const Product = () => {
 
     const handleDelete = async (id) => {
         try {
-            const response = await axios.delete("http://jainson-backend.ap-south-1.elasticbeanstalk.com/api/product/delete",
+            const response = await axios.delete("https://api.jainsonsindiaonline.com/api/product/delete",
                 {
                     data: {
                         id: id

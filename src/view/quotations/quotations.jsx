@@ -83,13 +83,13 @@ const Quotation = () => {
             const paramsFilter = startDate && endDate ? `?startDate=${startDate}&endDate=${endDate}`: '';
 
             try {
-                const response = await axios.get(`http://jainson-backend.ap-south-1.elasticbeanstalk.com/api/quotes/getAll${paramsFilter}`, {
+                const response = await axios.get(`https://api.jainsonsindiaonline.com/api/quotes/getAll${paramsFilter}`, {
                     headers: {
                         Authorization: `Bearer ${getToken}`, // Add the token to the Authorization header
                     },
                 });
 
-                const response1 = await axios.get('http://jainson-backend.ap-south-1.elasticbeanstalk.com/api/categories/showAll', {
+                const response1 = await axios.get('https://api.jainsonsindiaonline.com/api/categories/showAll', {
                     headers: {
                         Authorization: `Bearer ${getToken}`, // Add the token to the Authorization header
                     },

@@ -63,7 +63,7 @@ const Login = () => {
     setSuccessMsg("");
 
     try {
-      const response = await axios.post("http://jainson-backend.ap-south-1.elasticbeanstalk.com/api/auth/signin", data);
+      const response = await axios.post("https://api.jainsonsindiaonline.com/api/auth/signin", data);
       if (response?.status === 200) {
         navigate('/dashboard')
         setSuccessMsg("Login successful!");
