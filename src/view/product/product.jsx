@@ -201,6 +201,8 @@ const Product = () => {
         },
         resolver: yupResolver(validationSchema)
     });
+    const [searchText, setSearchText] = useState("");
+    const [selectdropDownValue, setSelectDropDownValue] = useState("");
     const images = watch("photos");
     const newCategory = watch("newCategory");
     // Function to handle image selection
@@ -513,18 +515,18 @@ const Product = () => {
                 <Typography component={'h1'} fontSize={'26px'}>
                     Product List
                 </Typography>
-                <Box display={'flex'} gap={4} height={'max-content'}> 
-                    <TextField placeholder="Search Product" sx={{ height: "max-content" }} />
+                <Box display={'flex'} gap={4} height={'max-content'}>
+                    <TextField placeholder="Search Product" sx={{ height: "max-content" }} onChange={(e) => setSearchText(e.target.value)} />
                     <Select value={dropDownValue}
-                        onChange={(event) => setDropDownValue(event.target.value)}
+                        onChange={(event) => { setDropDownValue(event.target.value); setSelectDropDownValue(event.target.value) }}
                         displayEmpty
-                        renderValue={(selected) => (selected ? selected : "Select an option")}
+                        // renderValue={(selected) => (selected ? selected : "Select an option")}
                     >
                         <MenuItem disabled value="">
                             Select an option
                         </MenuItem>
                         {
-                            categoryData?.map((data) => <MenuItem>
+                            categoryData?.map((data) => <MenuItem value={data?._id}> 
                                 {data?.name}
                             </MenuItem>)
                         }
@@ -739,13 +741,16 @@ const Product = () => {
                                                     </TableRow>
                                                 </TableHead>
                                                 <TableBody>
-                                                    {productData.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage).map((row, index) => (
+                                                    {productData?.filter(product =>
+                                                        (selectdropDownValue ? product.category === selectdropDownValue : true) &&
+                                                        (searchText ? product.name.toLowerCase().includes(searchText.toLowerCase()) : true)
+                                                    )?.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage).map((row, index) => (
                                                         <TableRow key={row.id}>
 
                                                             <TableCell>{index + 1}</TableCell>
                                                             <TableCell>{row.name}</TableCell>
                                                             <TableCell>{row?.category}</TableCell>
-                                                            <TableCell>Category</TableCell>
+
                                                             {
                                                                 row?.features?.map((data) => <TableCell>{data.value}</TableCell>)
                                                             }
@@ -767,40 +772,56 @@ const Product = () => {
                                 </Box>
                             ) :
 
+                                <Box>
 
-                                <Grid container spacing={3} px={4}>
-                                    {productData.map((product, index) => (
-                                        <>
-                                            <Grid item xs={12} sm={6} md={4} key={index} >
-                                                <Card>
-                                                    {console.log(product, 'Check Product')}
-                                                    <CardContent>
-                                                        <Typography variant="h6">{product?.name}</Typography>
-                                                        <Typography variant="body2">{product?.description}</Typography>
-                                                        {
-                                                            product?.features?.map((data) => <Typography variant="body2">{data?.key}: {data?.value}</Typography>)
-                                                        }
-                                                        <Box sx={{ mt: 2 }}>
-                                                            {product?.image && <img src={product?.image} alt="product" style={{ maxWidth: '100%' }} />}
-                                                        </Box>
+                                    <Grid container spacing={3} px={4}>
+                                        {productData?.filter(product =>
+                                            (selectdropDownValue ? product.category === selectdropDownValue : true) &&
+                                            (searchText ? product.name.toLowerCase().includes(searchText.toLowerCase()) : true)
+                                        )?.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage).map((product, index) => (
+                                            <>
+                                                <Grid item xs={12} sm={6} md={4} key={index} >
+                                                    <Card>
+                                                        {console.log(product, 'Check Product')}
+                                                        <CardContent>
+                                                            <Typography variant="h6">{product?.name}</Typography>
+                                                            <Typography variant="body2">{product?.description}</Typography>
+                                                            {
+                                                                product?.features?.map((data) => <Typography variant="body2">{data?.key}: {data?.value}</Typography>)
+                                                            }
+                                                            <Box sx={{ mt: 2 }}>
+                                                                {product?.image && <img src={product?.image} alt="product" style={{ maxWidth: '100%' }} />}
+                                                            </Box>
 
-                                                        {/* Edit and Delete buttons */}
-                                                        <Box sx={{ display: 'flex', justifyContent: 'space-between', mt: 2 }}>
-                                                            <IconButton onClick={() => { handleEdit(index); setDrawerOpen(true); setProductId(product?._id) }} color="primary">
-                                                                <Edit />
-                                                            </IconButton>
-                                                            <IconButton onClick={() => handleDelete(product?._id)} color="secondary">
-                                                                <Delete />
-                                                            </IconButton>
-                                                        </Box>
-                                                    </CardContent>
-                                                </Card>
-                                            </Grid>
+                                                            {/* Edit and Delete buttons */}
+                                                            <Box sx={{ display: 'flex', justifyContent: 'space-between', mt: 2 }}>
+                                                                <IconButton onClick={() => { handleEdit(index); setDrawerOpen(true); setProductId(product?._id) }} color="primary">
+                                                                    <Edit />
+                                                                </IconButton>
+                                                                <IconButton onClick={() => handleDelete(product?._id)} color="secondary">
+                                                                    <Delete />
+                                                                </IconButton>
+                                                            </Box>
+                                                        </CardContent>
+                                                    </Card>
+                                                </Grid>
 
-                                        </>
+                                            </>
 
-                                    ))}
-                                </Grid>}
+                                        ))}
+
+                                    </Grid>
+                                    <TablePagination
+                                        rowsPerPageOptions={[5, 10, 20, 50, 100]}
+                                        component="div"
+                                        count={productData?.length}
+                                        rowsPerPage={rowsPerPage}
+                                        page={page}
+                                        onPageChange={handleChangePage}
+                                        onRowsPerPageChange={handleChangeRowsPerPage}
+                                    />
+                                </Box>
+                        }
                     </>
             }
 

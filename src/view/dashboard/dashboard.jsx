@@ -69,6 +69,7 @@ const Dashboard = () => {
       const tempData4 = await getData('https://api.jainsonsindiaonline.com/api/categories/showAll');
       // const monthlyQuote = await getData('https://api.jainsonsindiaonline.com/api/quotes/getAll?monthlyData=true');
       // console.log(monthlyQuote , 'monthlyQuote')
+      console.log(tempData3, 'tempData3')
       setProductData(tempData1);
       setQuoteData(tempData2);
       setcontactUsData(tempData3);
