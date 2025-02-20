@@ -446,7 +446,7 @@ const Product = () => {
 
     const exportToExcel = () => {
 
-        const headers = ["name", "title", "material", "category", "brand", "size", "partNo", "moving", "createdAt", "updatedAt"]; // Constant headers
+        const headers = ["name", "title", "material", "category", "brand", "size", "partNo", "Stock Movement", "createdAt", "updatedAt"]; // Constant headers
 
         function findFeature(header, features) {
             const feat = features.find((ftr) => header.toLowerCase() == ftr['key'].toLowerCase())
