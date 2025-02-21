@@ -277,26 +277,29 @@ const Product = () => {
 
 
         // Append image files
-
+        if (data.photos.length > 0) {
+            data.photos.forEach((file, index) => {
+                formData.append('photos', file);
+            });
+        }
 
         if (isUpdate) {
             formData.append("id", productId);
             formData.append("newName", data.name);
+            data.features.forEach((feature, index) => {
+                formData.append(`updatedFeatures[${index}][key]`, feature.key);
+                formData.append(`updatedFeatures[${index}][value]`, feature.value);
+            });
         } else {
             formData.append("name", data.name);
             formData.append("category", data.category);
-            if (data.photos.length > 0) {
-                data.photos.forEach((file, index) => {
-                    formData.append('photos', file);
-                });
-            }
+            data.features.forEach((feature, index) => {
+                formData.append(`features[${index}][key]`, feature.key);
+                formData.append(`features[${index}][value]`, feature.value);
+            });
         }
 
         // Append features
-        data.features.forEach((feature, index) => {
-            formData.append(`features[${index}][key]`, feature.key);
-            formData.append(`features[${index}][value]`, feature.value);
-        });
         if (isUpdate) {
 
             await axios.put(`https://api.jainsonsindiaonline.com/api/product/edit`, formData, {
@@ -754,7 +757,6 @@ const Product = () => {
                                                             <TableCell>{index + 1}</TableCell>
                                                             <TableCell>{row.name}</TableCell>
                                                             <TableCell>{row?.category}</TableCell>
-
                                                             {
                                                                 row?.features?.map((data) => <TableCell>{data.value}</TableCell>)
                                                             }
