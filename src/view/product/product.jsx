@@ -39,6 +39,7 @@ import * as XLSX from "xlsx";
 import 'react-toastify/dist/ReactToastify.css';
 import AppsIcon from '@mui/icons-material/Apps';
 import TableChartIcon from '@mui/icons-material/TableChart';
+
 const CustomButton = styled(Button)(({ theme }) => ({
     padding: '8px 16px !important',
     height: "max-content"
@@ -205,6 +206,8 @@ const Product = () => {
     const [selectdropDownValue, setSelectDropDownValue] = useState("");
     const images = watch("photos");
     const newCategory = watch("newCategory");
+    const [allImages, setAllImages] = useState([]);
+    const [removeImages , setRemoveImages] = useState([])
     // Function to handle image selection
     const handleImageChange = (e) => {
         // const selectedFiles = Array.from(e.target.files);
@@ -290,6 +293,9 @@ const Product = () => {
                 formData.append(`updatedFeatures[${index}][key]`, feature.key);
                 formData.append(`updatedFeatures[${index}][value]`, feature.value);
             });
+            if(removeImages) {
+                formData.append("toBeRemovedImages", removeImages);  
+            }
         } else {
             formData.append("name", data.name);
             formData.append("category", data.category);
@@ -447,7 +453,9 @@ const Product = () => {
     };
     const handleEdit = (index) => {
         const product = productData[index];
+        console.log(productData[index], 'productData[index]')
         Object.keys(product).forEach(key => setValue(key, product[key]));
+        setAllImages(productData[index]?.imageURLs)
         setIsUpdate(true)
     };
 
@@ -514,8 +522,13 @@ const Product = () => {
         setRowsPerPage(parseInt(event.target.value, 10));
         setPage(0);
     };
-
-    console.log(categoryData, 'categoryData')
+    const DeleteImages = (index) => {
+        const deleteImage = allImages?.filter((data, ind) => index !== ind);
+        
+        setRemoveImages([...removeImages, allImages[index]?.img])
+        setAllImages(deleteImage)
+    }
+    console.log(removeImages , 'removeImages 1212')
     return (
         <div style={{ height: "100%" }}>
             <Box display={'flex'} flex={1} justifyContent={'space-between'} mb={4} pt={4} px={4}>
@@ -670,8 +683,10 @@ const Product = () => {
                                 </>
                             )}
                         />
+                        {
+                            allImages?.map((data , index) => <Box display={'flex'} justifyContent={'space-between'} alignItems={'center'}><img src={data?.url} style={{ height: "100px", width: "100px" }} /><IconButton onClick={() => DeleteImages(index)}><DeleteIcon /></IconButton></Box>)
+                        }
                     </Box>
-
 
                     <Box>
 
