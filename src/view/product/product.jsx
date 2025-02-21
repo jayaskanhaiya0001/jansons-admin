@@ -292,6 +292,7 @@ const Product = () => {
             data.features.forEach((feature, index) => {
                 formData.append(`updatedFeatures[${index}][key]`, feature.key);
                 formData.append(`updatedFeatures[${index}][value]`, feature.value);
+                formData.append("category", data.category);
             });
             if(removeImages) {
                 formData.append("toBeRemovedImages", removeImages);  
