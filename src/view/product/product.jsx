@@ -292,8 +292,9 @@ const Product = () => {
             data.features.forEach((feature, index) => {
                 formData.append(`updatedFeatures[${index}][key]`, feature.key);
                 formData.append(`updatedFeatures[${index}][value]`, feature.value);
-                formData.append("category", data.category);
+           
             });
+            formData.append("category", data.category);
             if(removeImages) {
                 formData.append("toBeRemovedImages", removeImages);  
             }
@@ -529,7 +530,7 @@ const Product = () => {
         setRemoveImages([...removeImages, allImages[index]?.img])
         setAllImages(deleteImage)
     }
-    console.log(removeImages , 'removeImages 1212')
+    console.log(removeImages , 'RemoveImages 1212')
     return (
         <div style={{ height: "100%" }}>
             <Box display={'flex'} flex={1} justifyContent={'space-between'} mb={4} pt={4} px={4}>
