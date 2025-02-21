@@ -24,9 +24,9 @@ ChartJS.register(
   Legend
 );
 
-const getToken = localStorage.getItem('token');
 
 const Dashboard = () => {
+  const getToken = localStorage.getItem('token');
 
   const [productData, setProductData] = useState();
   const [quoteData, setQuoteData] = useState();
@@ -40,44 +40,52 @@ const Dashboard = () => {
     //console.log('st: ', st);
     setIsContentVisible(st);
   }
+  
+  const fetchData = async () => {
+    const getData = async (url) => {
+      const getToken = localStorage.getItem('token');
+      //console.log('The token is: ', getToken);
 
+      try {
+        const response = await axios.get(url, {
+          headers: {
+            Authorization: `Bearer ${getToken}`, // Add the token to the Authorization header
+          },
+        });
+console.log(response , 'RESPONSE' , url)
+if(url === 'https://api.jainsonsindiaonline.com/api/contactUs/showAll') {
+  return response.data.contacts;
+} else {
+
+  return response.data.data;
+}
+      } catch (error) {
+        console.error('Error fetching data from:', url, error);
+        return null; // Return null or handle the error properly
+      }
+    };
+
+    const tempData1 = await getData('https://api.jainsonsindiaonline.com/api/product/getAll');
+    const tempData2 = await getData('https://api.jainsonsindiaonline.com/api/quotes/getAll');
+    const tempData3 = await getData('https://api.jainsonsindiaonline.com/api/contactUs/showAll');
+
+    const tempData4 = await getData('https://api.jainsonsindiaonline.com/api/categories/showAll');
+
+    // const monthlyQuote = await getData('https://api.jainsonsindiaonline.com/api/quotes/getAll?monthlyData=true');
+    // console.log(monthlyQuote , 'monthlyQuote')
+    // console.log(tempData3, 'tempData3')
+    setProductData(tempData1);
+    setQuoteData(tempData2);
+    setcontactUsData(tempData3);
+    setcategoryData(tempData4);
+  };
   // Fetch data from API
   useEffect(() => {
 
-    const fetchData = async () => {
-      const getData = async (url) => {
-        const getToken = localStorage.getItem('token');
-        //console.log('The token is: ', getToken);
-
-        try {
-          const response = await axios.get(url, {
-            headers: {
-              Authorization: `Bearer ${getToken}`, // Add the token to the Authorization header
-            },
-          });
-
-          return response.data.data;
-        } catch (error) {
-          console.error('Error fetching data from:', url, error);
-          return null; // Return null or handle the error properly
-        }
-      };
-
-      const tempData1 = await getData('https://api.jainsonsindiaonline.com/api/product/getAll');
-      const tempData2 = await getData('https://api.jainsonsindiaonline.com/api/quotes/getAll');
-      const tempData3 = await getData('https://api.jainsonsindiaonline.com/api/contactUs/showAll');
-      const tempData4 = await getData('https://api.jainsonsindiaonline.com/api/categories/showAll');
-      // const monthlyQuote = await getData('https://api.jainsonsindiaonline.com/api/quotes/getAll?monthlyData=true');
-      // console.log(monthlyQuote , 'monthlyQuote')
-      console.log(tempData3, 'tempData3')
-      setProductData(tempData1);
-      setQuoteData(tempData2);
-      setcontactUsData(tempData3);
-      setcategoryData(tempData4);
-    };
+  
 
     fetchData();
-  }, []);
+  }, [getToken]);
 
   useEffect(() => {
     const getData = async (url) => {
@@ -110,7 +118,7 @@ const Dashboard = () => {
     getData()
   }, [])
 
-  console.log(monthlyEnquiry , 'monthlyEnquiry')
+  console.log(monthlyEnquiry, 'monthlyEnquiry')
   const productData1 = {
     labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', "Aug", 'Sep', "Oct", 'Nov', "Dec"],
     datasets: [
@@ -233,10 +241,12 @@ const Dashboard = () => {
             </Typography>
           </Paper>
         </Grid>
+
         <Grid item xs={12} md={3} onClick={() => navigate('/enquiry')}>
           <Paper elevation={3} sx={{ p: 2, textAlign: 'center' }} onClick={() => contactUsData?.length > 0 && setVisibleContent('contacts')}>
             <Typography variant="h6">New Enquiry</Typography>
             {/* <Typography variant="h4" color="tertiary">{contactUsData?.length}</Typography> */}
+            {console.log(contactUsData, 'contactUsData')}
             <Typography variant="h4" color="tertiary">
               <span >{contactUsData?.length || 0}</span>
 

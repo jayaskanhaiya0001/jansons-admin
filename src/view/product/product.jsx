@@ -274,18 +274,22 @@ const Product = () => {
         const formData = new FormData();
 
         // formData.append("newCategory", defaultValues.newCategory);
-        formData.append("name", data.name);
-        formData.append("category", data.category);
+
 
         // Append image files
-        if (data.photos.length > 0) {
-            data.photos.forEach((file, index) => {
-                formData.append('photos', file);
-            });
-        }
+
 
         if (isUpdate) {
             formData.append("id", productId);
+            formData.append("newName", data.name);
+        } else {
+            formData.append("name", data.name);
+            formData.append("category", data.category);
+            if (data.photos.length > 0) {
+                data.photos.forEach((file, index) => {
+                    formData.append('photos', file);
+                });
+            }
         }
 
         // Append features
@@ -516,17 +520,17 @@ const Product = () => {
                     Product List
                 </Typography>
                 <Box display={'flex'} gap={4} height={'max-content'}>
-                    <TextField placeholder="Search Product" sx={{ height: "max-content" }} onChange={(e) => setSearchText(e.target.value)} />
+                    <TextField placeholder="Search by product name" sx={{ height: "max-content" }} onChange={(e) => setSearchText(e.target.value)} />
                     <Select value={dropDownValue}
                         onChange={(event) => { setDropDownValue(event.target.value); setSelectDropDownValue(event.target.value) }}
                         displayEmpty
-                        // renderValue={(selected) => (selected ? selected : "Select an option")}
+                    // renderValue={(selected) => (selected ? selected : "Select an option")}
                     >
                         <MenuItem disabled value="">
-                            Select an option
+                            Select an Category
                         </MenuItem>
                         {
-                            categoryData?.map((data) => <MenuItem value={data?._id}> 
+                            categoryData?.map((data) => <MenuItem value={data?._id}>
                                 {data?.name}
                             </MenuItem>)
                         }
